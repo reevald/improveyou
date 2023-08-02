@@ -1,0 +1,98 @@
+################# API ##################
+
+Users account [JWTAuth]
+- [✅] Register [No auth]
+- [✅] Login [No auth]
+- [✅] Logout
+- [✅] Validate access token
+- [✅] Refresh access token
+- [🏃] Send email verify [JWTAuth]
+- [🏃] Confirm email verify [NoAuth, MagicLink]
+- [🏃] Send email reset password [NoAuth]
+- [🏃] Confirm reset password [NoAuth, MagicLink]
+- Public mode (share if public) [NoAuth]
+- User me
+- Change me username
+- Change me public mode
+
+Users daily check [JWTAuth]
+- Trigger daily check
+- Send daily check
+
+Users game stats [JWTAuth]
+- User me game stats
+
+Users streak [JWTAuth]
+- User me streak
+
+Users reward [JWTAuth]
+- User me check event with auto claim rewards
+
+Users bag [JWTAuth]
+- User me bag items
+- User me bag equip item with update object with itemId
+
+Users shop [JWTAuth]
+- User me shop items
+- User me shop buy with update bag with itemId
+
+Users activities [JWTAuth]
+- User me activities with recommendation
+- Detail activity
+- User me resolve play activity
+- User me resolve quiz activity
+- User me resolve finish acitivy with impact
+
+Users leaderboard [JWTAuth]
+- User me leaderboard
+
+Users tracker [JWTAuth & EmailValidated]
+- [🏃] User me tracker
+
+Logger [JWTAuth]
+- Logger event activity
+
+########################################
+
+Authentications
+- [✅] JWT authentication
+
+Permissions
+- [✅] Email validated permissions
+
+Throthling (scopes)
+- [🏃] Users app [Login, etc]
+- 
+
+Documentation
+- Readme
+- OpenApi spec (deploy with github page)
+
+Unit test each app
+- Users
+- 
+
+Third party [conditional]
+- Google login
+- Cloudinary
+- Amazon ses (sandbox, real(?))
+
+Integrate [final api]
+- Deploy + config database (prod mode)
+- Setting domain + https
+
+############# CONTENT [MVP] ############
+- Landing page [Logo, etc]
+
+Users object [Host: Cloudinary, etc]
+- Character (1 u/ default) [output: sprite/json]
+- Background (1 u/ default) [output: image/svg/png]
+- (hat, shirt, trouser) (2-3 u/ Shop), (1 u/ Default), (1 u/ Reward leaderboard)
+[output: sprite/json + thumbnail:image/svg/png]
+Sample themes: pakaian tentara, polisi, atau lainnya yang simple as possible
+
+Activities [Host: Cloudinary, etc]
+- Exercise (5 model with ilustration) [output: model+lib(tfjs), images/json]
+- Meditation (3 model pose + 2 Audio) [output: model+lib(tfjs), images/json, audio]
+- Reading (5 Article) [output: artikel(json), soal-pilgan(json), answer-key(json/db-based+encrypt)]
+Reference: youtube, chatGPT, bard, etc
