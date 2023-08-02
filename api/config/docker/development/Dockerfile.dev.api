@@ -1,0 +1,36 @@
+FROM python:3.8-alpine
+
+# Set working directory
+RUN mkdir -p /opt/improveyou_dev /opt/improveyou_dev/config
+WORKDIR /opt/improveyou_dev
+
+# Set python path
+# __init__.py not include directly since we just set volume for config/django directly
+RUN touch /opt/improveyou_dev/config/__init__.py
+ENV PYTHONPATH /opt/improveyou_dev/
+
+# System packages if using postgresql
+# https://github.com/psycopg/psycopg2/issues/684#issuecomment-392015532
+# RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
+
+# System packages if using mysql
+# https://stackoverflow.com/a/56072299
+# Increases this images size to ~400MB
+# TODOs: implement this https://github.com/jfloff/alpine-python/issues/32
+RUN apk update && apk add mariadb-dev gcc python3-dev musl-dev
+
+# Python packages
+RUN pip install --upgrade pip
+COPY ./config/requirements/development.txt ./config/requirements_dev.txt
+RUN pip install -r ./config/requirements_dev.txt
+
+# Copy entrypoint
+COPY ./config/docker/development/entrypoint.dev.sh ./config/entrypoint.dev.sh
+RUN chmod +x /opt/improveyou_dev/config/entrypoint.dev.sh
+
+# Base directory
+WORKDIR /opt/improveyou_dev/app
+ENV BASE_DIR /opt/improveyou_dev/app
+
+# Run entrypoint
+ENTRYPOINT [ "/opt/improveyou_dev/config/entrypoint.dev.sh" ]
