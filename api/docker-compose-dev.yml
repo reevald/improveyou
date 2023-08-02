@@ -1,0 +1,19 @@
+version: "3.8" # Docker engine > 19.03
+
+services:
+  improveyou-api-dev:
+    build:
+      context: .
+      dockerfile: ./config/docker/development/Dockerfile.dev.api
+    # https://stackoverflow.com/a/49476339
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./app/:/opt/improveyou_dev/app/
+      - ./config/django/:/opt/improveyou_dev/config/django/
+    ports:
+      - "8000:8000"
+    # In this case we use sql (mysql) server from host
+    extra_hosts:
+      - "dockerhost:<your host-ipaddress>"
+    env_file:
+      - ./config/docker/development/env.dev.container
