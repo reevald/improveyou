@@ -8,7 +8,7 @@ REM Database
 set SQL_ENGINE=django.db.backends.mysql
 set SQL_DATABASE=improveyoudb
 set SQL_USER=root
-set SQL_PASSWORD=
+set SQL_PASSWORD=rootpassword
 set SQL_HOST=127.0.0.1
 set SQL_PORT=3306
 
