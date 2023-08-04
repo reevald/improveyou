@@ -6,11 +6,14 @@ from django.db import models
 from django.utils import timezone
 
 TIERS = [("basic", "BASIC"), ("premium", "PREMIUM")]
+
 STREAK_STATUS = [
     ("none", "NONE"),
     ("continue", "CONTINUE"),
     ("discontinue", "DISCONTINUE"),
 ]
+
+SOURCE_TYPES = [("default", "DEFAULT"), ("event", "EVENT"), ("shop", "SHOP")]
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -98,6 +101,29 @@ class GameStat(models.Model):
         db_table = "users_game_stats"
 
 
+class DailyCheckQuestion(models.Model):
+    # TODO: create api to get daily check question (other)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    question = models.TextField(blank=True, null=True)
+    availability = models.BooleanField(default=False)
+    type_answer = models.CharField(
+        choices=[("limited", "LIMITED"), ("free", "FREE")], max_length=32
+    )
+    limited_answer = models.TextField(blank=True, null=True)
+    # Schema limited answer
+    # Save (to string): json.dumps(dict) and loads (to dict) : json.loads(string)
+    # [
+    #     "answer opsi 1",
+    #     "answer opsi 2",
+    # ]
+
+    def __str__(self):
+        return self.question
+
+    class Meta:
+        db_table = "users_daily_check_questions"
+
+
 class DailyCheck(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user_id")
@@ -106,10 +132,10 @@ class DailyCheck(models.Model):
         choices=STREAK_STATUS, default="none", max_length=32
     )
     # Save (to string): json.dumps(dict) and loads (to dict) : json.loads(string)
-    # Schema questions
+    # Schema other questions
     # [
     #     {
-    #         "question": "App rate that help user",
+    #         "question_id": "0asdja9sjd91j09dj90129",
     #         "user_answer": 5
     #     }
     # ]
@@ -123,3 +149,111 @@ class DailyCheck(models.Model):
         db_table = "users_daily_check"
         # One day = one check for each user
         unique_together = ("user_id", "date_target")
+
+
+class Object(models.Model):
+    user_id = models.OneToOneField(
+        User, on_delete=models.CASCADE, primary_key=True, db_column="user_id"
+    )
+    character_id = models.ForeignKey(
+        "items.Item",
+        on_delete=models.CASCADE,
+        db_column="character_id",
+        related_name="object_character",
+    )
+    hat_id = models.ForeignKey(
+        "items.Item",
+        on_delete=models.CASCADE,
+        db_column="hat_id",
+        related_name="object_hat",
+    )
+    shirt_id = models.ForeignKey(
+        "items.Item",
+        on_delete=models.CASCADE,
+        db_column="shirt_id",
+        related_name="object_shirt",
+    )
+    trouser_id = models.ForeignKey(
+        "items.Item",
+        on_delete=models.CASCADE,
+        db_column="trouser_id",
+        related_name="object_trouser",
+    )
+    background_id = models.ForeignKey(
+        "items.Item",
+        on_delete=models.CASCADE,
+        db_column="background_id",
+        related_name="object_background",
+    )
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return (
+            f"[👤 {self.user_id}]"
+            + f"[👺 {self.character_id}]"
+            + f"[🎩 {self.hat_id}]"
+            + f"[👕 {self.shirt_id}]"
+            + f"[👖 {self.trouser_id}]"
+            + f"[🏞️ {self.background_id}]"
+        )
+
+    class Meta:
+        db_table = "users_objects"
+
+
+class Bag(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user_id")
+    item_id = models.ForeignKey(
+        "items.Item", on_delete=models.CASCADE, db_column="item_id"
+    )
+    source_type = models.CharField(choices=SOURCE_TYPES, max_length=32)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"[👤 {self.user_id}]" + f"[📦 {self.item_id}]"
+
+    class Meta:
+        db_table = "users_bags"
+        unique_together = ("user_id", "item_id")
+
+
+class ActivityLog(models.Model):
+    # Only insert new data if the previous activity already done (finish)
+    # Case 1: If today not finish then continue tomorrow until finish (w/o play trigger)
+    # (count as today activity => start today not tomorrow)
+    # Case 2: Even today not finish, if tomorrow w/ new trigger play
+    # then play_at updated and if tomorrow finish it will count as tomorrow activity
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user_id")
+    activity_id = models.ForeignKey(
+        "activities.Activity", on_delete=models.CASCADE, db_column="activity_id"
+    )
+    created_at = models.DateTimeField(default=timezone.now)
+    play_at = models.DateTimeField(blank=True, null=True)
+    finish_at = models.DateTimeField(blank=True, null=True)
+    track = models.TextField(blank=True, null=True)
+
+    # Schema of track
+    # Save (to string): json.dumps(dict) and loads (to dict) : json.loads(string)
+    # {
+    #     "type": "READ",
+    #     "data": {
+    #         "target": {"type": "AMOUNT", "current": 0, "goals": 10, "unit": "STAR"},
+    #         "attempt": {"current": 0, "max": 3},
+    #         "logs": {  # From init (play) it will generate all choosen questId
+    #             "<questId>": -1  # 1=true, 0=false, -1=Not answer yet(default)
+    #         },
+    #     },
+    # }
+    # {
+    #     "type": "POSE", # Same for "AUDIO"
+    #     "data": {
+    #         "target": {"type": "TIME", "current": 0, "goals": 180, "unit": "SECOND"},
+    #     },
+    # }
+    def __str__(self):
+        return f"[👤 {self.user_id}]" + f"[🏃 {self.activity_id}]"
+
+    class Meta:
+        db_table = "users_activity_log"
