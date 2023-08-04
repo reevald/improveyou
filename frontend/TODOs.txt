@@ -1,0 +1,16 @@
+[TODOs]
+- / #landing page
+- /signup
+- /verify-email
+- /confirm-email/[magic link url]
+- /login
+- /forgot-password
+- /reset-password/[magic link url]
+- /user/[username] #if public mode = true
+- /home
+- /activities
+- /activities/[type activity] #{exercise, meditation, reading}
+- /activity/[type activity]/[slug activity]
+- /leaderboard/[type activity]
+- /tracker
+- /429-too-many-requests
