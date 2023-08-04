@@ -1,0 +1,11 @@
+[TODOs]
+- ETL [urge]
+- zoo (model comparization)
+- utils (model builder, metrics, input handler)
+- transform module [pose, urge]
+- tuner module [pose, urge]
+- trainer module [pose, urge]
+- interactive_pipelines [pose, urge]
+- pipelines [conditional: w/ apache beam/airflow] [urge]
+- deploy model w/ tf serving (urge prediction) + tfjs (pose classification)
+- [conditional] deploy tfx pipelines w/ vertex ai [urge]
