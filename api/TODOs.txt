@@ -20,13 +20,16 @@ Users daily check [JWTAuth]
 - Send daily check
 
 Users game stats [JWTAuth]
-- User me game stats
+- [✅] User me game stats
 
 Users streak [JWTAuth]
-- User me streak
+- [❌] User me streak (merge with gamestat above)
 
 Users reward [JWTAuth]
 - User me check event with auto claim rewards
+
+Users object [JWTAuth]
+- [✅] User me object
 
 Users bag [JWTAuth]
 - User me bag items
@@ -87,7 +90,7 @@ Integrate [final api]
 Users object [Host: Cloudinary, etc]
 - Character (1 u/ default) [output: sprite/json]
 - Background (1 u/ default) [output: image/svg/png]
-- (hat, shirt, trouser) (2-3 u/ Shop), (1 u/ Default), (1 u/ Reward leaderboard)
+- (hat, shirt, trouser) (2-3 u/ Shop), (1 u/ Reward leaderboard)
 [output: sprite/json + thumbnail:image/svg/png]
 Sample themes: pakaian tentara, polisi, atau lainnya yang simple as possible
 
