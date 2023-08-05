@@ -37,7 +37,12 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",  # Not good for production
     ],
     "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.ScopedRateThrottle"],
-    "DEFAULT_THROTTLE_RATES": {"register": "10/hour", "login": "10/hour"},
+    "DEFAULT_THROTTLE_RATES": {
+        "register": "10/hour",
+        "login/logout": "10/hour",
+        "jwt:refresh/validate": "5/hour",
+        "resources_home": "720/hour",
+    },
 }
 
 # CORS
