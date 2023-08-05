@@ -10,8 +10,6 @@ ACTIVITY_CATEGORIES = [
     ("reading", "READING"),
 ]
 
-TARGET_TYPES = [("time", "TIME"), ("star", "STAR")]
-
 
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
@@ -83,3 +81,56 @@ class Activity(models.Model):
     # }
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = "activities"
+
+
+class UrgeCategory(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    level = (
+        models.CharField(
+            choices=(
+                [
+                    ("very_low", "VERY_LOW"),
+                    ("low", "LOW"),
+                    ("medium", "MEDIUM"),
+                    ("high", "HIGH"),
+                    ("very_heigh", "VERY_HEIGH"),
+                ]
+            ),
+            max_length=32,
+        ),
+    )
+    prediction_min = models.FloatField(blank=True, null=True)
+    prediction_max = models.FloatField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.level
+
+    class Meta:
+        db_table = "urges_categories"
+
+
+class Recommendation(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    urge_category = models.ForeignKey(
+        UrgeCategory, on_delete=models.CASCADE, db_column="urge_category_id"
+    )
+    activity_id = models.ForeignKey(
+        Activity, on_delete=models.CASCADE, db_column="activity_id"
+    )
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return f"[💃 {self.urge_category}]" + f"[🏃 {self.activity_id}]"
+
+    class Meta:
+        db_table = "activities_recommendations"
