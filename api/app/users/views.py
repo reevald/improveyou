@@ -1,12 +1,17 @@
 from rest_framework import status
 from rest_framework.decorators import APIView
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, ParseError
 from rest_framework.response import Response
 
 from .auths import JWTAuthentication, JWTHandler
-from .models import User
+from .models import GameStat, Object, User
 from .permissions import EmailValidatedPermission
-from .serializers import LoginUserSerializer, RegisterUserSerializer
+from .serializers import (
+    LoginUserSerializer,
+    RegisterUserSerializer,
+    UserGameStatSerializer,
+    UserObjectSerializer,
+)
 
 
 class RegisterView(APIView):
@@ -16,6 +21,19 @@ class RegisterView(APIView):
         serializer = RegisterUserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            # Initilization data of object and gamestat
+            obj = Object(
+                user_id=User(**serializer.data),
+                character_id=None,
+                hat_id=None,
+                clothes_id=None,
+                shoes_id=None,
+            )
+            stat = GameStat(
+                user_id=User(**serializer.data),
+            )
+            obj.save()
+            stat.save()
             jwt_handler = JWTHandler()
             jwt_handler.set_credential({"id": str(serializer.data["id"])})
             response = jwt_handler.get_httpresponse_init_jwt()
@@ -24,7 +42,7 @@ class RegisterView(APIView):
 
 
 class LoginView(APIView):
-    throttle_scope = "login"
+    throttle_scope = "login/logout"
 
     def post(self, request):
         email = request.data["email"]
@@ -48,7 +66,8 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
-    # Should be not throttling
+    throttle_scope = "login/logout"
+
     def get(self, request):
         token = request.COOKIES.get("jwt")
         if not token:
@@ -60,7 +79,8 @@ class LogoutView(APIView):
 
 
 class ValidateAccessTokenView(APIView):
-    # Should be not throttling
+    throttle_scope = "jwt:refresh/validate"
+
     def get(self, request):
         jwt_auth = JWTAuthentication()
         payload = jwt_auth.validate_access_token(request=request)
@@ -68,7 +88,8 @@ class ValidateAccessTokenView(APIView):
 
 
 class RefreshAccessTokenView(APIView):
-    # Should be not throttling
+    throttle_scope = "jwt:refresh/validate"
+
     def get(self, request):
         jwt_auth = JWTAuthentication()
         new_access_token = jwt_auth.refresh_access_token(request=request)
@@ -81,6 +102,32 @@ class PasswordResetView:
 
 class PasswordResetConfirmView:
     pass
+
+
+class UserMeObjectView(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        try:
+            user_object = Object.objects.get(user_id=self.request.user.id)
+        except Object.DoesNotExist:
+            raise ParseError("Request contains malformed data")
+        serializer = UserObjectSerializer(user_object)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserMeGameStatView(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        try:
+            user_gamestat = GameStat.objects.get(user_id=self.request.user.id)
+        except GameStat.DoesNotExist:
+            raise ParseError("Request contains malformed data")
+        serializer = UserGameStatSerializer(user_gamestat)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserMeTrackerView(APIView):
