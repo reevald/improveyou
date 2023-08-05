@@ -2,7 +2,7 @@ import django.contrib.auth.password_validation as validators
 from django.core import exceptions
 from rest_framework import serializers
 
-from .models import User
+from .models import GameStat, Object, User
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -44,3 +44,23 @@ class LoginUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id"]
+
+
+class UserObjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Object
+        fields = ["user_id", "character_id", "hat_id", "clothes_id", "shoes_id"]
+
+
+class UserGameStatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameStat
+        fields = [
+            "user_id",
+            "gold",
+            "poin_brain",
+            "poin_heart",
+            "poin_muscle",
+            "streak_current",
+            "streak_percent_interest",
+        ]
