@@ -7,5 +7,7 @@ urlpatterns = [
     path("logout", views.LogoutView.as_view(), name="logout"),
     path("validate", views.ValidateAccessTokenView.as_view(), name="validate-token"),
     path("refresh", views.RefreshAccessTokenView.as_view(), name="refresh-token"),
+    path("me/object", views.UserMeObjectView.as_view(), name="user-object"),
+    path("me/gamestat", views.UserMeGameStatView.as_view(), name="user-gamestat"),
     path("me/tracker", views.UserMeTrackerView.as_view(), name="user-tracker"),
 ]
