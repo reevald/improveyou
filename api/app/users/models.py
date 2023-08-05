@@ -257,3 +257,56 @@ class ActivityLog(models.Model):
 
     class Meta:
         db_table = "users_activity_log"
+
+
+class EventReward(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user_id")
+    event_id = models.ForeignKey(
+        "items.Event", on_delete=models.CASCADE, db_column="event_id"
+    )
+    rewards_claimed_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return f"[👤 {self.user_id}]" + f"🐾 {self.event_id}]"
+
+    class Meta:
+        db_table = "users_events_rewards"
+        unique_together = ("user_id", "event_id")
+
+
+class TaskLog(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user_id")
+    task_id = models.ForeignKey(
+        "tasks.Task", on_delete=models.CASCADE, db_column="task_id"
+    )
+    current_progress = models.IntegerField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    completed_at = models.DateTimeField(blank=True, null=True)
+    # Created_at and completed_at must be in the same day
+
+    def __str__(self):
+        return f"[👤 {self.user_id}]" + f"[📝 {self.task_id}]"
+
+    class Meta:
+        db_table = "users_task_log"
+
+
+class RecommendationLog(models.Model):
+    # Each date to get new recommendation
+    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user_id")
+    recommendation_id = models.ForeignKey(
+        "activities.Recommendation",
+        on_delete=models.CASCADE,
+        db_column="recommendation_id",
+    )
+    prediction = models.FloatField(blank=True, null=True)
+    issue_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"[👤 {self.user_id}]" + f"[🎲 {self.recommendation_id}]"
+
+    class Meta:
+        db_table = "users_recommendation_log"

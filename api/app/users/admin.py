@@ -6,9 +6,12 @@ from .models import (
     DailyCheck,
     DailyCheckQuestion,
     EmailVerificationToken,
+    EventReward,
     GameStat,
     Object,
+    RecommendationLog,
     ResetPasswordToken,
+    TaskLog,
     User,
 )
 
@@ -23,3 +26,6 @@ admin.site.register(Object)
 admin.site.register(Bag)
 admin.site.register(ActivityLog)
 admin.site.register(DailyCheckQuestion)
+admin.site.register(EventReward)
+admin.site.register(TaskLog)
+admin.site.register(RecommendationLog)
