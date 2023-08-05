@@ -159,30 +159,40 @@ class Object(models.Model):
         "items.Item",
         on_delete=models.CASCADE,
         db_column="character_id",
+        blank=True,  # Default (resource handle by frontend)
+        null=True,
         related_name="object_character",
     )
     hat_id = models.ForeignKey(
         "items.Item",
         on_delete=models.CASCADE,
         db_column="hat_id",
+        blank=True,  # Default
+        null=True,
         related_name="object_hat",
     )
-    shirt_id = models.ForeignKey(
+    clothes_id = models.ForeignKey(
         "items.Item",
         on_delete=models.CASCADE,
-        db_column="shirt_id",
-        related_name="object_shirt",
+        db_column="clothes_id",
+        blank=True,  # Default
+        null=True,
+        related_name="object_clothes",
     )
-    trouser_id = models.ForeignKey(
+    shoes_id = models.ForeignKey(
         "items.Item",
         on_delete=models.CASCADE,
-        db_column="trouser_id",
-        related_name="object_trouser",
+        db_column="shoes_id",
+        blank=True,  # Default
+        null=True,
+        related_name="object_shoes",
     )
     background_id = models.ForeignKey(
         "items.Item",
         on_delete=models.CASCADE,
         db_column="background_id",
+        blank=True,  # Default
+        null=True,
         related_name="object_background",
     )
     updated_at = models.DateTimeField(blank=True, null=True)
@@ -192,8 +202,8 @@ class Object(models.Model):
             f"[👤 {self.user_id}]"
             + f"[👺 {self.character_id}]"
             + f"[🎩 {self.hat_id}]"
-            + f"[👕 {self.shirt_id}]"
-            + f"[👖 {self.trouser_id}]"
+            + f"[👕 {self.clothes_id}]"
+            + f"[👖 {self.shoes_id}]"
             + f"[🏞️ {self.background_id}]"
         )
 

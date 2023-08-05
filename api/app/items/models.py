@@ -8,8 +8,8 @@ ITEM_CATEGORIES = [
     ("character", "CHARACTER"),
     ("background", "BACKGROUND"),
     ("hat", "HAT"),
-    ("shirt", "SHIRT"),
-    ("trouser", "TROUSER"),
+    ("clothes", "CLOTHES"),
+    ("shoes", "SHOES"),
 ]
 
 ITEM_RARITIES = [
