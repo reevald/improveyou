@@ -32,11 +32,11 @@ Users object [JWTAuth]
 - [✅] User me object
 
 Users bag [JWTAuth]
-- User me bag items
+- [✅] User me bag items
 - User me bag equip item with update object with itemId
 
 Users shop [JWTAuth]
-- User me shop items
+- [✅] Shop items
 - User me shop buy with update bag with itemId
 
 Users tasks [JWTAuth]
