@@ -10,6 +10,7 @@ from .permissions import EmailValidatedPermission
 from .serializers import (
     LoginUserSerializer,
     RegisterUserSerializer,
+    UserBagItemSerializer,
     UserChangePublicitySerializer,
     UserChangeUsernameSerializer,
     UserGameStatSerializer,
@@ -145,6 +146,15 @@ class UserMeChangePublicityView(APIView):
             serializer.save()
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserMeBagItemView(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        serializer = UserBagItemSerializer(self.request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserMeTrackerView(APIView):
