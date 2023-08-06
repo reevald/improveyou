@@ -1,3 +1,4 @@
+from django.contrib.auth.models import update_last_login
 from rest_framework import status
 from rest_framework.decorators import APIView
 from rest_framework.exceptions import AuthenticationFailed, ParseError
@@ -9,6 +10,8 @@ from .permissions import EmailValidatedPermission
 from .serializers import (
     LoginUserSerializer,
     RegisterUserSerializer,
+    UserChangePublicitySerializer,
+    UserChangeUsernameSerializer,
     UserGameStatSerializer,
     UserObjectSerializer,
 )
@@ -45,24 +48,14 @@ class LoginView(APIView):
     throttle_scope = "login/logout"
 
     def post(self, request):
-        email = request.data["email"]
-        password = request.data["password"]
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            raise AuthenticationFailed(
-                "Sorry, that email doesn't exist. Please try again."
-            )
-
-        if not user.check_password(password):
-            raise AuthenticationFailed(
-                "Sorry, that password isn't right. Please try again."
-            )
-        serializer = LoginUserSerializer(user)
-        jwt_handler = JWTHandler()
-        jwt_handler.set_credential({"id": str(serializer.data["id"])})
-        response = jwt_handler.get_httpresponse_init_jwt()
-        return response
+        serializer = LoginUserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+            jwt_handler = JWTHandler()
+            update_last_login(None, user)
+            jwt_handler.set_credential({"id": str(user.id)})
+            return jwt_handler.get_httpresponse_init_jwt()
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(APIView):
@@ -128,6 +121,30 @@ class UserMeGameStatView(APIView):
             raise ParseError("Request contains malformed data")
         serializer = UserGameStatSerializer(user_gamestat)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserMeChangeUsernameView(APIView):
+    throttle_scope = "change_username"
+    authentication_classes = [JWTAuthentication]
+
+    def put(self, request):
+        serializer = UserChangeUsernameSerializer(self.request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserMeChangePublicityView(APIView):
+    throttle_scope = "change_publicity"
+    authentication_classes = [JWTAuthentication]
+
+    def put(self, request):
+        serializer = UserChangePublicitySerializer(self.request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserMeTrackerView(APIView):
