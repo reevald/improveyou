@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core import exceptions
 from django.core.validators import EmailValidator
 from django.utils import timezone
+from items.serializers import ItemBagSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -131,3 +132,11 @@ class UserChangePublicitySerializer(serializers.ModelSerializer):
         instance.is_public_mode = validated_data.get("is_public_mode")
         instance.save()
         return instance
+
+
+class UserBagItemSerializer(serializers.ModelSerializer):
+    bag_items = ItemBagSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["bag_items"]
