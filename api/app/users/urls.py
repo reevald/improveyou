@@ -19,5 +19,6 @@ urlpatterns = [
         views.UserMeChangePublicityView.as_view(),
         name="user-change-publicity",
     ),
+    path("me/bag/items", views.UserMeBagItemView.as_view(), name="user-bag-item"),
     path("me/tracker", views.UserMeTrackerView.as_view(), name="user-tracker"),
 ]
