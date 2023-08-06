@@ -29,8 +29,6 @@ COOKIES_REFRESH_TOKEN = {
 }
 
 REST_FRAMEWORK = {
-    # The DateTime will be converted into timestamp (unix epoch)
-    "DATETIME_FORMAT": "%s",
     # Only return in JSON format
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
@@ -42,6 +40,8 @@ REST_FRAMEWORK = {
         "login/logout": "10/hour",
         "jwt:refresh/validate": "5/hour",
         "resources_home": "720/hour",
+        "change_username": "15/day",
+        "change_publicity": "60/hour",
     },
 }
 
@@ -49,3 +49,20 @@ REST_FRAMEWORK = {
 # https://github.com/adamchainz/django-cors-headers
 CORS_ALLOW_ALL_ORIGINS = True  # Not good for productions
 CORS_ALLOW_CREDENTIALS = True  # Cookies
+
+# LOGGING
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+    },
+}
