@@ -12,8 +12,8 @@ Users account [JWTAuth]
 - [🏃] Confirm reset password [NoAuth, MagicLink]
 - Public mode (share if public) [NoAuth]
 - User me
-- Change me username
-- Change me public mode
+- [✅] Change me username
+- [✅] Change me public mode
 
 Users daily check [JWTAuth]
 - Trigger daily check
@@ -39,6 +39,8 @@ Users shop [JWTAuth]
 - User me shop items
 - User me shop buy with update bag with itemId
 
+Users tasks [JWTAuth]
+
 Users activities [JWTAuth]
 - User me activities with recommendation
 - Detail activity
@@ -47,7 +49,7 @@ Users activities [JWTAuth]
 - User me resolve finish acitivy with impact
 
 Users leaderboard [JWTAuth]
-- User me leaderboard
+- User me leaderboard / [type poin]
 
 Users tracker [JWTAuth & EmailValidated]
 - [🏃] User me tracker
