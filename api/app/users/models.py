@@ -31,6 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     ban_status = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
+    bag_items = models.ManyToManyField("items.Item", through="Bag")
 
     # This will usually be a username of some kind, but it can also be an email address,
     # or any other unique identifier
