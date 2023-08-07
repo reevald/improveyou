@@ -1,13 +1,17 @@
+import json
+
 import django.contrib.auth.password_validation as validators
 from django.conf import settings
 from django.core import exceptions
 from django.core.validators import EmailValidator
+from django.db import IntegrityError
 from django.utils import timezone
+from items.models import Item
 from items.serializers import ItemBagSerializer
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, ParseError
 
-from .models import GameStat, Object, User
+from .models import Bag, DailyCheck, DailyCheckQuestion, GameStat, Object, User
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -72,9 +76,31 @@ class LoginUserSerializer(serializers.ModelSerializer):
 
 
 class UserObjectSerializer(serializers.ModelSerializer):
+    character_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="character_id__sprite_path"
+    )
+    hat_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="hat_id__sprite_path"
+    )
+    clothes_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="clothes_id__sprite_path"
+    )
+    shoes_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="shoes_id__sprite_path"
+    )
+    background_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="background_id__sprite_path"
+    )
+
     class Meta:
         model = Object
-        fields = ["character_id", "hat_id", "clothes_id", "shoes_id"]
+        fields = [
+            "character_sprite",
+            "hat_sprite",
+            "clothes_sprite",
+            "shoes_sprite",
+            "background_sprite",
+        ]
 
 
 class UserGameStatSerializer(serializers.ModelSerializer):
@@ -140,3 +166,121 @@ class UserBagItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["bag_items"]
+
+
+class UserBagEquipItemSerializer(serializers.ModelSerializer):
+    # 1) Check item owned or not
+    # 2) If yes, equip it and change object data
+    item_id = serializers.UUIDField()
+
+    class Meta:
+        model = Object
+        fields = [
+            "character_id",
+            "hat_id",
+            "clothes_id",
+            "shoes_id",
+            "background_id",
+            "item_id",
+        ]
+        extra_kwargs = {"item_id": {"required": True}}
+        # Don't need more query for each field (items) (depth = 1 / flat)
+        depth = 1
+
+    def update(self, instance, validated_data):
+        try:
+            bag_item = Bag.objects.values(
+                "user_id", "item_id", "item_id__category"
+            ).get(user_id=instance.id, item_id=validated_data.get("item_id"))
+        except Bag.DoesNotExist:
+            raise ParseError("Request contains malformed data")
+
+        category_id = bag_item["item_id__category"] + "_id"
+
+        # Overide instance User => instance Object
+        instance = self.Meta.model(user_id=instance)
+
+        # Change <category>_id, check ITEM_CATEGORIES in Item model
+        setattr(instance, category_id, Item(id=bag_item["item_id"]))
+
+        instance.save(update_fields=[category_id])
+        return instance
+
+
+class UserDailyCheckQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyCheckQuestion
+        fields = [
+            "id",
+            "question",
+            "type_answer",
+            "limited_answer",
+        ]
+
+    def to_representation(self, instance):
+        data = super(UserDailyCheckQuestionSerializer, self).to_representation(instance)
+        clear_json = str(instance.limited_answer).strip("'<>() ").replace("'", '"')
+        data["limited_answer"] = json.loads(clear_json)
+        return data
+
+
+class UserDailyCheckSerializer(serializers.ModelSerializer):
+    qna = serializers.ListField(
+        min_length=0, max_length=settings.MAX_DAILY_CHECK_OTHER_QUESTIONS
+    )
+    streak_status = serializers.ChoiceField(choices=["none", "continue", "discontinue"])
+
+    class Meta:
+        model = DailyCheck
+        fields = [
+            "qna",
+            "streak_status",
+        ]
+        extra_kwargs = {
+            "qna": {"required": True},
+            "streak_status": {"required": True},
+        }
+
+    def create(self, validated_data):
+        # Schema of qna
+        # {
+        #     "streak_status": "something"
+        #     "qna": [
+        #         {
+        #             "question_id": "something",
+        #             "user_answer": "something"
+        #         }
+        #     ]
+        # }
+        instance_user = self.context["user"]
+        other_questions = []
+        for qna in validated_data.get("qna"):
+            question_id = qna.get("question_id")
+            user_answer = qna.get("user_answer")
+            if not question_id or not user_answer:
+                raise ParseError("Request contains malformed data")
+            other_questions.append(question_id)
+
+        # Validation list of question_id
+        if len(other_questions) > 0:
+            try:
+                qna = DailyCheckQuestion.objects.filter(
+                    pk__in=[i["question_id"] for i in other_questions]
+                )
+            except IndexError:
+                # https://stackoverflow.com/a/50453530
+                raise serializers.ValidationError("Invalid other questions")
+
+        instance = DailyCheck(
+            user_id=instance_user,
+            date_target=timezone.now().date(),
+            streak_status=validated_data.get("streak_status"),
+            other_questions=json.dumps(other_questions),
+        )
+        try:
+            instance.save()
+        except IntegrityError:
+            raise serializers.ValidationError(
+                "Dailycheck already filled in today or something wrong"
+            )
+        return instance
