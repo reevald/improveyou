@@ -20,5 +20,11 @@ urlpatterns = [
         name="user-change-publicity",
     ),
     path("me/bag/items", views.UserMeBagItemView.as_view(), name="user-bag-item"),
+    path(
+        "me/bag/equipitem",
+        views.UserMeBagEquipItemView.as_view(),
+        name="user-bag-equip-item",
+    ),
+    path("me/dailycheck", views.UserMeDailyCheckView.as_view(), name="user-dailycheck"),
     path("me/tracker", views.UserMeTrackerView.as_view(), name="user-tracker"),
 ]
