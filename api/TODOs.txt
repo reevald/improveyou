@@ -16,8 +16,8 @@ Users account [JWTAuth]
 - [✅] Change me public mode
 
 Users daily check [JWTAuth]
-- Trigger daily check
-- Send daily check
+- [✅] Trigger daily check
+- [✅] Send daily check
 
 Users game stats [JWTAuth]
 - [✅] User me game stats
@@ -33,11 +33,11 @@ Users object [JWTAuth]
 
 Users bag [JWTAuth]
 - [✅] User me bag items
-- User me bag equip item with update object with itemId
+- [✅] User me bag equip item with update object with itemId
 
 Users shop [JWTAuth]
 - [✅] Shop items
-- User me shop buy with update bag with itemId
+- [✅] User me shop buy with update bag with itemId
 
 Users tasks [JWTAuth]
 
