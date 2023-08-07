@@ -5,14 +5,17 @@ from rest_framework.exceptions import AuthenticationFailed, ParseError
 from rest_framework.response import Response
 
 from .auths import JWTAuthentication, JWTHandler
-from .models import GameStat, Object, User
+from .models import DailyCheckQuestion, GameStat, Object, User
 from .permissions import EmailValidatedPermission
 from .serializers import (
     LoginUserSerializer,
     RegisterUserSerializer,
+    UserBagEquipItemSerializer,
     UserBagItemSerializer,
     UserChangePublicitySerializer,
     UserChangeUsernameSerializer,
+    UserDailyCheckQuestionSerializer,
+    UserDailyCheckSerializer,
     UserGameStatSerializer,
     UserObjectSerializer,
 )
@@ -104,7 +107,13 @@ class UserMeObjectView(APIView):
 
     def get(self, request):
         try:
-            user_object = Object.objects.get(user_id=self.request.user.id)
+            user_object = Object.objects.values(
+                "character_id__sprite_path",
+                "hat_id__sprite_path",
+                "clothes_id__sprite_path",
+                "shoes_id__sprite_path",
+                "background_id__sprite_path",
+            ).get(user_id=self.request.user.id)
         except Object.DoesNotExist:
             raise ParseError("Request contains malformed data")
         serializer = UserObjectSerializer(user_object)
@@ -155,6 +164,37 @@ class UserMeBagItemView(APIView):
     def get(self, request):
         serializer = UserBagItemSerializer(self.request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserMeBagEquipItemView(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def put(self, request):
+        serializer = UserBagEquipItemSerializer(self.request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserMeDailyCheckView(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        instance = DailyCheckQuestion.objects.filter(availability=True)
+        serializer = UserDailyCheckQuestionSerializer(instance, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = UserDailyCheckSerializer(
+            data=request.data, context={"user": self.request.user}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserMeTrackerView(APIView):
