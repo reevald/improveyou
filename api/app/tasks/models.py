@@ -7,9 +7,13 @@ from django.utils import timezone
 
 POIN_TYPES = [
     ("poin_brain", "POIN BRAIN"),
-    ("poin_heart", "POIN HEARTH"),
+    ("poin_heart", "POIN HEART"),
     ("poin_muscle", "POIN MUSCLE"),
 ]
+
+TARGET_TYPES = [("time", "TIME"), ("amount", "AMOUNT")]
+
+TARGET_UNITS = [("second", "SECOND"), ("star", "STAR"), ("did", "DID")]
 
 
 class Task(models.Model):
@@ -18,12 +22,11 @@ class Task(models.Model):
     name = models.CharField(max_length=100, validators=[MinLengthValidator(2)])
     reward_poin_type = models.CharField(choices=POIN_TYPES, max_length=32)
     reward_poin_value = models.IntegerField(blank=True, null=True)
-    target_type = models.CharField(
-        choices=([("time", "TIME"), ("amount", "AMOUNT")]), max_length=32
-    )
+    target_type = models.CharField(choices=TARGET_TYPES, max_length=32)
     target_value = models.IntegerField(blank=True, null=True)
     target_unit = models.CharField(
-        choices=([("second", "SECOND"), ("star", "STAR")]), max_length=32
+        choices=TARGET_UNITS,
+        max_length=32,
     )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(blank=True, null=True)
