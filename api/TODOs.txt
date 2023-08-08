@@ -11,7 +11,7 @@ Users account [JWTAuth]
 - [🏃] Send email reset password [NoAuth]
 - [🏃] Confirm reset password [NoAuth, MagicLink]
 - Public mode (share if public) [NoAuth]
-- User me
+- [❌] User me (not needed yet)
 - [✅] Change me username
 - [✅] Change me public mode
 
@@ -40,10 +40,11 @@ Users shop [JWTAuth]
 - [✅] User me shop buy with update bag with itemId
 
 Users tasks [JWTAuth]
+- [✅] User me tasks with progress
 
 Users activities [JWTAuth]
 - User me activities with recommendation
-- Detail activity
+- [✅] Detail activity
 - User me resolve play activity
 - User me resolve quiz activity
 - User me resolve finish acitivy with impact
