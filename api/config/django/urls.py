@@ -22,4 +22,5 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("user/", include("users.urls")),
     path("shop/", include("items.urls_shop")),
+    path("activities/", include("activities.urls")),
 ]

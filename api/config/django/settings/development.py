@@ -40,6 +40,7 @@ REST_FRAMEWORK = {
         "login/logout": "10/hour",
         "jwt:refresh/validate": "5/hour",
         "resources_home": "720/hour",
+        "resources_activity": "720/hour",
         "change_username": "15/day",
         "change_publicity": "60/hour",
         "buy_item": "30/hour",
