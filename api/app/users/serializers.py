@@ -11,7 +11,7 @@ from items.serializers import ItemBagSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed, ParseError
 
-from .models import Bag, DailyCheck, DailyCheckQuestion, GameStat, Object, User
+from .models import Bag, DailyCheck, DailyCheckQuestion, GameStat, Object, TaskLog, User
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -263,12 +263,10 @@ class UserDailyCheckSerializer(serializers.ModelSerializer):
 
         # Validation list of question_id
         if len(other_questions) > 0:
-            try:
-                qna = DailyCheckQuestion.objects.filter(
-                    pk__in=[i["question_id"] for i in other_questions]
-                )
-            except IndexError:
-                # https://stackoverflow.com/a/50453530
+            qna = DailyCheckQuestion.objects.filter(
+                pk__in=[i["question_id"] for i in other_questions]
+            )
+            if len(qna) == 0:
                 raise serializers.ValidationError("Invalid other questions")
 
         instance = DailyCheck(
@@ -284,3 +282,37 @@ class UserDailyCheckSerializer(serializers.ModelSerializer):
                 "Dailycheck already filled in today or something wrong"
             )
         return instance
+
+
+class UserTaskProgressSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True, source="task_id__id")
+    activity_category = serializers.CharField(
+        read_only=True, source="task_id__activity_category"
+    )
+    name = serializers.CharField(read_only=True, source="task_id__name")
+    reward_poin_type = serializers.CharField(
+        read_only=True, source="task_id__reward_poin_type"
+    )
+    reward_poin_value = serializers.IntegerField(
+        read_only=True, source="task_id__reward_poin_value"
+    )
+    target_type = serializers.CharField(read_only=True, source="task_id__target_type")
+    target_value = serializers.IntegerField(
+        read_only=True, source="task_id__target_value"
+    )
+    target_unit = serializers.CharField(read_only=True, source="task_id__target_unit")
+
+    class Meta:
+        model = TaskLog
+        fields = [
+            "id",
+            "activity_category",
+            "name",
+            "reward_poin_type",
+            "reward_poin_value",
+            "target_type",
+            "target_value",
+            "target_unit",
+            "current_progress",
+            "completed_at",
+        ]

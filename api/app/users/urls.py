@@ -26,5 +26,6 @@ urlpatterns = [
         name="user-bag-equip-item",
     ),
     path("me/dailycheck", views.UserMeDailyCheckView.as_view(), name="user-dailycheck"),
+    path("me/tasks", views.UserMeTaskProgressView.as_view(), name="user-tasks"),
     path("me/tracker", views.UserMeTrackerView.as_view(), name="user-tracker"),
 ]

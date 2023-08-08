@@ -1,11 +1,13 @@
 from django.contrib.auth.models import update_last_login
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import APIView
 from rest_framework.exceptions import AuthenticationFailed, ParseError
 from rest_framework.response import Response
+from tasks.models import Task
 
 from .auths import JWTAuthentication, JWTHandler
-from .models import DailyCheckQuestion, GameStat, Object, User
+from .models import DailyCheckQuestion, GameStat, Object, TaskLog, User
 from .permissions import EmailValidatedPermission
 from .serializers import (
     LoginUserSerializer,
@@ -18,6 +20,7 @@ from .serializers import (
     UserDailyCheckSerializer,
     UserGameStatSerializer,
     UserObjectSerializer,
+    UserTaskProgressSerializer,
 )
 
 
@@ -195,6 +198,50 @@ class UserMeDailyCheckView(APIView):
             serializer.save()
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserMeTaskProgressView(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def get_tasklog_instances(self):
+        tasklog_instances = TaskLog.objects.values(
+            "task_id__id",
+            "task_id__activity_category",
+            "task_id__name",
+            "task_id__reward_poin_type",
+            "task_id__reward_poin_value",
+            "task_id__target_type",
+            "task_id__target_value",
+            "task_id__target_unit",
+            "current_progress",
+            "completed_at",
+        ).filter(user_id=self.request.user.id, created_at=timezone.now().date())
+
+        return tasklog_instances
+
+    def get(self, request):
+        tasklog_instances = self.get_tasklog_instances()
+        if len(tasklog_instances) == 0:
+            # If task log haven't created (one day = one log for each task)
+            # 1) Get list task
+            tasks_instances = Task.objects.all()
+            # 2) Create tasklog for each task
+            tasklog_instances = [
+                TaskLog(
+                    user_id=self.request.user,
+                    task_id=task,
+                    current_progress=0,
+                    created_at=timezone.now().date(),
+                )
+                for task in tasks_instances
+            ]
+
+            TaskLog.objects.bulk_create(objs=tasklog_instances)
+
+            tasklog_instances = self.get_tasklog_instances()
+        serializer = UserTaskProgressSerializer(tasklog_instances, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserMeTrackerView(APIView):
