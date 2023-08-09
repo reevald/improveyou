@@ -1,13 +1,23 @@
 from django.contrib.auth.models import update_last_login
+from django.db import DatabaseError, transaction
 from django.utils import timezone
+from items.models import Item, Reward
 from rest_framework import status
 from rest_framework.decorators import APIView
-from rest_framework.exceptions import AuthenticationFailed, ParseError
+from rest_framework.exceptions import AuthenticationFailed, ParseError, ValidationError
 from rest_framework.response import Response
 from tasks.models import Task
 
 from .auths import JWTAuthentication, JWTHandler
-from .models import DailyCheckQuestion, GameStat, Object, TaskLog, User
+from .models import (
+    Bag,
+    DailyCheckQuestion,
+    EventReward,
+    GameStat,
+    Object,
+    TaskLog,
+    User,
+)
 from .permissions import EmailValidatedPermission
 from .serializers import (
     LoginUserSerializer,
@@ -18,6 +28,7 @@ from .serializers import (
     UserChangeUsernameSerializer,
     UserDailyCheckQuestionSerializer,
     UserDailyCheckSerializer,
+    UserEventRewardSerializer,
     UserGameStatSerializer,
     UserObjectSerializer,
     UserTaskProgressSerializer,
@@ -241,6 +252,80 @@ class UserMeTaskProgressView(APIView):
 
             tasklog_instances = self.get_tasklog_instances()
         serializer = UserTaskProgressSerializer(tasklog_instances, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserMeEventRewardView(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        # Note:
+        # Event will be handled by admin (human in the loop)
+        # EventReward will be handled by system (scheduler) or admin
+
+        # 1) Check that user have rewards in event_reward table
+        list_event_id = EventReward.objects.values("event_id", "event_id__name").filter(
+            user_id=self.request.user, rewards_claimed_at__isnull=True
+        )
+
+        if len(list_event_id) == 0:
+            return Response([], status=status.HTTP_200_OK)
+
+        # 2) Check if reward available in event
+        list_item_id = Reward.objects.values("item_id", "event_id").filter(
+            event_id__in=[data["event_id"] for data in list_event_id]
+        )
+
+        if len(list_item_id) == 0:
+            return Response([], status=status.HTTP_200_OK)
+
+        data_event = {
+            dict_event["event_id"]: {"event_name": dict_event["event_id__name"]}
+            for dict_event in list_event_id
+        }
+
+        data_reward_event = {
+            dict_reward["item_id"]: {"event_id": dict_reward["event_id"]}
+            for dict_reward in list_item_id
+        }
+
+        new_bag_item = [
+            Bag(
+                user_id=self.request.user,
+                item_id=Item(id=data["item_id"]),
+                source_type="event",
+            )
+            for data in list_item_id
+        ]
+
+        try:
+            with transaction.atomic():
+                # 3) Update date rewards_claimed_at
+                # Ignore conflict when duplicate unique pair (item_id and user_id)
+                # Only insert real new items that user haven't these yet
+                Bag.objects.bulk_create(new_bag_item, ignore_conflicts=True)
+                # 4) Insert rewards into bag
+                EventReward.objects.filter(
+                    user_id=self.request.user, rewards_claimed_at__isnull=True
+                ).update(rewards_claimed_at=timezone.now())
+        except DatabaseError:
+            raise ValidationError("Failed to claim rewards or save rewards into bag")
+
+        # Since there is limitation return of bulk_create (can't return all fields)
+        # We need to select Items manually
+        # https://stackoverflow.com/a/39314124
+        item_instances = Item.objects.filter(
+            pk__in=[data["item_id"] for data in list_item_id]
+        )
+
+        for item_instance in item_instances:
+            event_id = data_reward_event[item_instance.id]["event_id"]
+            event_name = data_event[event_id]["event_name"]
+            setattr(item_instance, "event__id", event_id)
+            setattr(item_instance, "event__name", event_name)
+
+        serializer = UserEventRewardSerializer(item_instances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

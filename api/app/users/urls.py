@@ -27,5 +27,10 @@ urlpatterns = [
     ),
     path("me/dailycheck", views.UserMeDailyCheckView.as_view(), name="user-dailycheck"),
     path("me/tasks", views.UserMeTaskProgressView.as_view(), name="user-tasks"),
+    path(
+        "me/event-rewards",
+        views.UserMeEventRewardView.as_view(),
+        name="user-event-rewards",
+    ),
     path("me/tracker", views.UserMeTrackerView.as_view(), name="user-tracker"),
 ]
