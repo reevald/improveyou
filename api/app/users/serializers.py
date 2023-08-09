@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core import exceptions
 from django.core.validators import EmailValidator
 from django.db import IntegrityError
+from django.db.models import Case, ExpressionWrapper, F, IntegerField, When
 from django.utils import timezone
 from items.models import Item
 from items.serializers import ItemBagSerializer
@@ -269,18 +270,45 @@ class UserDailyCheckSerializer(serializers.ModelSerializer):
             if len(qna) == 0:
                 raise serializers.ValidationError("Invalid other questions")
 
-        instance = DailyCheck(
+        instance = self.Meta.model(
             user_id=instance_user,
             date_target=timezone.now().date(),
             streak_status=validated_data.get("streak_status"),
             other_questions=json.dumps(other_questions),
         )
+
         try:
             instance.save()
         except IntegrityError:
             raise serializers.ValidationError(
                 "Dailycheck already filled in today or something wrong"
             )
+
+        # Impact:
+        # Update gamestat (current streak & percent interest streak)
+        # https://docs.djangoproject.com/en/4.2/ref/models/conditional-expressions/
+        # https://docs.djangoproject.com/en/4.2/ref/models/expressions/#using-f-with-annotations
+        # 1) When continue streak +1 else 0
+        # 2) Max streak percent interest 50% else 0-9=>0%, 10-19=>10%, etc
+        GameStat.objects.filter(user_id=instance_user).update(
+            streak_current=F("streak_current") + 1
+            if validated_data.get("streak_status") == "continue"
+            else 0,
+            streak_percent_interest=Case(
+                When(streak_current__gte=49, then=50),
+                When(
+                    streak_current__lt=49,
+                    then=ExpressionWrapper(
+                        # In this stage, streak current already updated +1
+                        F("streak_current") - F("streak_current") % 10,
+                        output_field=IntegerField(),
+                    ),
+                ),
+            )
+            if validated_data.get("streak_status") == "continue"
+            else 0,
+        )
+
         return instance
 
 
@@ -315,4 +343,22 @@ class UserTaskProgressSerializer(serializers.ModelSerializer):
             "target_unit",
             "current_progress",
             "completed_at",
+        ]
+
+
+class UserEventRewardSerializer(serializers.ModelSerializer):
+    event_id = serializers.UUIDField(read_only=True, source="event__id")
+    event_name = serializers.CharField(read_only=True, source="event__name")
+
+    class Meta:
+        model = Item
+        fields = [
+            "id",
+            "event_id",
+            "event_name",
+            "category",
+            "name",
+            "rarity",
+            "thumbnail_path",
+            "availability",
         ]
