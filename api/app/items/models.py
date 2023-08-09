@@ -85,3 +85,4 @@ class Reward(models.Model):
 
     class Meta:
         db_table = "rewards"
+        unique_together = ("event_id", "item_id")
