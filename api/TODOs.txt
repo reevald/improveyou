@@ -26,7 +26,7 @@ Users streak [JWTAuth]
 - [❌] User me streak (merge with gamestat above)
 
 Users reward [JWTAuth]
-- User me check event with auto claim rewards
+- [✅] User me check event with auto claim rewards
 
 Users object [JWTAuth]
 - [✅] User me object
