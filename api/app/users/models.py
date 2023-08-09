@@ -1,5 +1,6 @@
 import uuid
 
+from activities.models import URGE_LEVELS
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -306,18 +307,18 @@ class TaskLog(models.Model):
 
 class RecommendationLog(models.Model):
     # Each date to get new recommendation
+    # Using default medium value and prediction can blank / null
+    # to prevent if machine learning service have trouble
     id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column="user_id")
-    recommendation_id = models.ForeignKey(
-        "activities.Recommendation",
-        on_delete=models.CASCADE,
-        db_column="recommendation_id",
-    )
     prediction = models.FloatField(blank=True, null=True)
-    issue_at = models.DateTimeField(default=timezone.now)
+    urge_level = models.CharField(choices=URGE_LEVELS, default="medium", max_length=32)
+    issue_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"[👤 {self.user_id}]" + f"[🎲 {self.recommendation_id}]"
+        return f"[👤 {self.user_id}]" + f"[🎲 {self.prediction}]"
 
     class Meta:
         db_table = "users_recommendation_log"
+        # One day = one prediction
+        unique_together = ("user_id", "issue_at")

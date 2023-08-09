@@ -10,6 +10,14 @@ ACTIVITY_CATEGORIES = [
     ("reading", "READING"),
 ]
 
+URGE_LEVELS = [
+    ("very_low", "VERY_LOW"),
+    ("low", "LOW"),
+    ("medium", "MEDIUM"),
+    ("high", "HIGH"),
+    ("very_heigh", "VERY_HEIGH"),
+]
+
 
 class Activity(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
@@ -89,39 +97,9 @@ class Activity(models.Model):
         db_table = "activities"
 
 
-class UrgeCategory(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
-    level = (
-        models.CharField(
-            choices=(
-                [
-                    ("very_low", "VERY_LOW"),
-                    ("low", "LOW"),
-                    ("medium", "MEDIUM"),
-                    ("high", "HIGH"),
-                    ("very_heigh", "VERY_HEIGH"),
-                ]
-            ),
-            max_length=32,
-        ),
-    )
-    prediction_min = models.FloatField(blank=True, null=True)
-    prediction_max = models.FloatField(blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(blank=True, null=True)
-
-    def __str__(self):
-        return self.level
-
-    class Meta:
-        db_table = "urges_categories"
-
-
 class Recommendation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
-    urge_category = models.ForeignKey(
-        UrgeCategory, on_delete=models.CASCADE, db_column="urge_category_id"
-    )
+    urge_level = models.CharField(choices=URGE_LEVELS, default="medium", max_length=32)
     activity_id = models.ForeignKey(
         Activity, on_delete=models.CASCADE, db_column="activity_id"
     )
@@ -130,7 +108,7 @@ class Recommendation(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"[💃 {self.urge_category}]" + f"[🏃 {self.activity_id}]"
+        return f"[💃 {self.urge_category_id}]" + f"[🏃 {self.activity_id}]"
 
     class Meta:
         db_table = "activities_recommendations"
