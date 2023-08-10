@@ -43,7 +43,7 @@ Users tasks [JWTAuth]
 - [✅] User me tasks with progress
 
 Users activities [JWTAuth]
-- User me activities with recommendation
+- [✅] User me activities with recommendation
 - [✅] Detail activity
 - User me resolve play activity
 - User me resolve quiz activity
