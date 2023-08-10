@@ -301,11 +301,11 @@ class UserMeEventRewardView(APIView):
 
         try:
             with transaction.atomic():
-                # 3) Update date rewards_claimed_at
+                # 3) Insert rewards into bag
                 # Ignore conflict when duplicate unique pair (item_id and user_id)
                 # Only insert real new items that user haven't these yet
                 Bag.objects.bulk_create(new_bag_item, ignore_conflicts=True)
-                # 4) Insert rewards into bag
+                # 4) Update date rewards_claimed_at
                 EventReward.objects.filter(
                     user_id=self.request.user, rewards_claimed_at__isnull=True
                 ).update(rewards_claimed_at=timezone.now())

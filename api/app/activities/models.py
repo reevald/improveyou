@@ -108,7 +108,7 @@ class Recommendation(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"[💃 {self.urge_category_id}]" + f"[🏃 {self.activity_id}]"
+        return f"[💃 {self.urge_level}]" + f"[🏃 {self.activity_id}]"
 
     class Meta:
         db_table = "activities_recommendations"
