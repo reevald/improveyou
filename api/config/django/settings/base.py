@@ -70,7 +70,6 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "activities.apps.ActivitiesConfig",
     "items.apps.ItemsConfig",
-    "logger.apps.LoggerConfig",
     "tasks.apps.TasksConfig",
     "rest_framework",
     "corsheaders",
