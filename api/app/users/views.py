@@ -7,18 +7,13 @@ from rest_framework.response import Response
 from .auths import JWTAuthentication, JWTHandler
 from .models import DailyCheckQuestion, GameStat, Object, User
 from .permissions import EmailValidatedPermission
-from .serializers import (
-    LoginUserSerializer,
-    RegisterUserSerializer,
-    UserBagEquipItemSerializer,
-    UserBagItemSerializer,
-    UserChangePublicitySerializer,
-    UserChangeUsernameSerializer,
-    UserDailyCheckQuestionSerializer,
-    UserDailyCheckSerializer,
-    UserGameStatSerializer,
-    UserObjectSerializer,
-)
+from .serializers import (LoginUserSerializer, RegisterUserSerializer,
+                          UserBagEquipItemSerializer, UserBagItemSerializer,
+                          UserChangePublicitySerializer,
+                          UserChangeUsernameSerializer,
+                          UserDailyCheckQuestionSerializer,
+                          UserDailyCheckSerializer, UserGameStatSerializer,
+                          UserObjectSerializer)
 
 
 class RegisterView(APIView):
