@@ -11,6 +11,7 @@ from tasks.models import Task
 from .auths import JWTAuthentication, JWTHandler
 from .models import (
     Bag,
+    DailyCheck,
     DailyCheckQuestion,
     EventReward,
     GameStat,
@@ -18,12 +19,15 @@ from .models import (
     TaskLog,
     User,
 )
-from .permissions import EmailValidatedPermission
 from .serializers import (
     LoginUserSerializer,
     RegisterUserSerializer,
+    UserActivityFinishSerializer,
+    UserActivityQuizSerializer,
+    UserActivityStartSerializer,
     UserBagEquipItemSerializer,
     UserBagItemSerializer,
+    UserBagUnequipItemSerializer,
     UserChangePublicitySerializer,
     UserChangeUsernameSerializer,
     UserDailyCheckQuestionSerializer,
@@ -31,7 +35,9 @@ from .serializers import (
     UserEventRewardSerializer,
     UserGameStatSerializer,
     UserObjectSerializer,
+    UserStreakTrackSerializer,
     UserTaskProgressSerializer,
+    UserTaskTrackSerializer,
 )
 
 
@@ -122,6 +128,11 @@ class UserMeObjectView(APIView):
     def get(self, request):
         try:
             user_object = Object.objects.values(
+                "character_id",
+                "hat_id",
+                "clothes_id",
+                "shoes_id",
+                "background_id",
                 "character_id__sprite_path",
                 "hat_id__sprite_path",
                 "clothes_id__sprite_path",
@@ -186,6 +197,18 @@ class UserMeBagEquipItemView(APIView):
 
     def put(self, request):
         serializer = UserBagEquipItemSerializer(self.request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserMeBagUnequipItemView(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def put(self, request):
+        serializer = UserBagUnequipItemSerializer(self.request.user, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.validated_data, status=status.HTTP_200_OK)
@@ -329,9 +352,66 @@ class UserMeEventRewardView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class UserMeActivityStartView(APIView):
+    throttle_scope = "resources_activity"
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        serializer = UserActivityStartSerializer(
+            data=request.data, context={"user": self.request.user}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserMeActivityQuizView(APIView):
+    throttle_scope = "resources_activity"
+    authentication_classes = [JWTAuthentication]
+
+    def put(self, request):
+        serializer = UserActivityQuizSerializer(self.request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserMeActivityFinishView(APIView):
+    throttle_scope = "resources_activity"
+    authentication_classes = [JWTAuthentication]
+
+    def put(self, request):
+        serializer = UserActivityFinishSerializer(self.request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class UserMeTrackerView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [EmailValidatedPermission]
 
     def get(self, request):
-        return Response({"message": "it was permitted"}, status=status.HTTP_200_OK)
+        streak_track = (
+            DailyCheck.objects.values("streak_status", "date_target")
+            .filter(user_id=self.request.user.id)
+            .order_by("-created_at")
+        )
+
+        task_track = (
+            TaskLog.objects.values("task_id__activity_category", "completed_at")
+            .filter(user_id=self.request.user.id)
+            .order_by("-created_at")
+        )
+
+        serializer_streak = UserStreakTrackSerializer(streak_track, many=True)
+        serializer_track = UserTaskTrackSerializer(task_track, many=True)
+        return Response(
+            {
+                "streak_track": serializer_streak.data,
+                "task_track": serializer_track.data,
+            },
+            status=status.HTTP_200_OK,
+        )
