@@ -74,14 +74,15 @@ class Activity(models.Model):
     #         ],
     #         "articlePath": "/path/artikel.html",
     #         "qnaPath": "/path/qna.json",
-    #         "secretKey": "1idh9asiuhdji1niune91123dsad",
+    #         "secretKey": "1idh9asiuhdji1niune91123dsad", # base64
+    #         "secret"
     #         "guidePictures": [
     #             "/path/step1.jpg",
     #             "/path/step2.jpg"
     #         ],
     #         "target": {
     #             "type": "AMOUNT", # TIME or AMOUNT
-    #             "values": 10,
+    #             "values": [10],
     #             "unit":  "STAR" # SECOND or STAR
     #         },
     #         "attempt": 3 # hearth

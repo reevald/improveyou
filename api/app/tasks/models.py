@@ -17,6 +17,7 @@ TARGET_UNITS = [("second", "SECOND"), ("star", "STAR"), ("did", "DID")]
 
 
 class Task(models.Model):
+    # One activity_category = one task (to simplify)
     id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
     activity_category = models.CharField(choices=ACTIVITY_CATEGORIES, max_length=32)
     name = models.CharField(max_length=100, validators=[MinLengthValidator(2)])

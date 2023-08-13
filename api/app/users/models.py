@@ -241,6 +241,7 @@ class ActivityLog(models.Model):
     activity_id = models.ForeignKey(
         "activities.Activity", on_delete=models.CASCADE, db_column="activity_id"
     )
+    finished = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     play_at = models.DateTimeField(blank=True, null=True)
     finish_at = models.DateTimeField(blank=True, null=True)
@@ -253,8 +254,9 @@ class ActivityLog(models.Model):
     #     "data": {
     #         "target": {"type": "AMOUNT", "current": 0, "goals": 10, "unit": "STAR"},
     #         "attempt": {"current": 0, "max": 3},
-    #         "logs": {  # From init (play) it will generate all choosen questId
-    #             "<questId>": -1  # 1=true, 0=false, -1=Not answer yet(default)
+    #         "secret_key": "Akc9ajndqin9132mscsaSMqwlemq-wJAWIOcdsf3=="
+    #         "logs": {
+    #             "<questId>": -1  # 1=true, 0=false
     #         },
     #     },
     # }
