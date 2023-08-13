@@ -10,7 +10,7 @@ Users account [JWTAuth]
 - [🏃] Confirm email verify [NoAuth, MagicLink]
 - [🏃] Send email reset password [NoAuth]
 - [🏃] Confirm reset password [NoAuth, MagicLink]
-- Public mode (share if public) [NoAuth]
+- [🔮] Public mode (share if public) [NoAuth] (Next feature, not needed yet)
 - [❌] User me (not needed yet)
 - [✅] Change me username
 - [✅] Change me public mode
@@ -34,6 +34,7 @@ Users object [JWTAuth]
 Users bag [JWTAuth]
 - [✅] User me bag items
 - [✅] User me bag equip item with update object with itemId
+- [✅] User me bag unequip item with category object
 
 Users shop [JWTAuth]
 - [✅] Shop items
@@ -45,18 +46,18 @@ Users tasks [JWTAuth]
 Users activities [JWTAuth]
 - [✅] User me activities with recommendation
 - [✅] Detail activity
-- User me resolve play activity
-- User me resolve quiz activity
-- User me resolve finish acitivy with impact
+- [✅] User me resolve start activity
+- [✅] User me resolve quiz activity
+- [✅] User me resolve finish activity with impact
 
 Users leaderboard [JWTAuth]
 - User me leaderboard / [type poin]
 
 Users tracker [JWTAuth & EmailValidated]
-- [🏃] User me tracker
+- [✅] User me tracker
 
 Logger [JWTAuth]
-- Logger event activity
+- [❌] Logger event activity (Deprecated: expensive compute + not needed yet)
 
 ########################################
 
