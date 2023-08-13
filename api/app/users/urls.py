@@ -25,12 +25,32 @@ urlpatterns = [
         views.UserMeBagEquipItemView.as_view(),
         name="user-bag-equip-item",
     ),
+    path(
+        "me/bag/unequipitem",
+        views.UserMeBagUnequipItemView.as_view(),
+        name="user-bag-unequip-item",
+    ),
     path("me/dailycheck", views.UserMeDailyCheckView.as_view(), name="user-dailycheck"),
     path("me/tasks", views.UserMeTaskProgressView.as_view(), name="user-tasks"),
     path(
         "me/event-rewards",
         views.UserMeEventRewardView.as_view(),
         name="user-event-rewards",
+    ),
+    path(
+        "me/activity/start",
+        views.UserMeActivityStartView.as_view(),
+        name="user-activity-start",
+    ),
+    path(
+        "me/activity/quiz",
+        views.UserMeActivityQuizView.as_view(),
+        name="user-activity-quiz",
+    ),
+    path(
+        "me/activity/finish",
+        views.UserMeActivityFinishView.as_view(),
+        name="user-activity-finish",
     ),
     path("me/tracker", views.UserMeTrackerView.as_view(), name="user-tracker"),
 ]
