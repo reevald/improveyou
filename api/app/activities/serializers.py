@@ -13,7 +13,10 @@ class ActivityDetailSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(ActivityDetailSerializer, self).to_representation(instance)
         clear_json = str(instance.resources).strip("'<>() ").replace("'", '"')
-        data["resources"] = json.loads(clear_json)
+        resources = json.loads(clear_json)
+        # Remove credential qna
+        resources["data"].pop("secretKey", None)
+        data["resources"] = resources
         return data
 
 

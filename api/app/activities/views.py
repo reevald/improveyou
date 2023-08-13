@@ -78,10 +78,10 @@ class ActivitiesWithRecommendationView(APIView):
         categories = activity_categories if not category else [category]
         list_activities = []
         for cat in categories:
-            activity = Activity.objects.values(
+            activities = Activity.objects.values(
                 "id", "category", "slug", "name", "thumbnail_path", "created_at"
             ).filter(category=cat)[offset:limit]
-            list_activities.extend(activity)
+            list_activities.extend(activities)
 
         serializer_activities = ActivitySerializer(list_activities, many=True)
         serializer_recom_activities = ActivityRecommendationSerializer(
