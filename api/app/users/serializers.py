@@ -16,16 +16,8 @@ from rest_framework.exceptions import AuthenticationFailed, ParseError
 from schema import And, Schema, SchemaError
 from tasks.models import Task
 
-from .models import (
-    ActivityLog,
-    Bag,
-    DailyCheck,
-    DailyCheckQuestion,
-    GameStat,
-    Object,
-    TaskLog,
-    User,
-)
+from .models import (ActivityLog, Bag, DailyCheck, DailyCheckQuestion,
+                     GameStat, Object, TaskLog, User)
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -868,3 +860,16 @@ class UserTaskTrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskLog
         fields = ["category", "completed_at"]
+
+
+class LeaderboardEntrySerializer(serializers.Serializer):
+    user_game_stat = UserGameStatSerializer()
+    user_object = UserObjectSerializer()
+    # score = serializers.IntegerField()
+    rank = serializers.IntegerField(source='user_rank')
+    username = serializers.CharField(source='user.username')
+
+
+class LeaderboardSerializer(serializers.Serializer):
+    top20 = LeaderboardEntrySerializer(many=True)
+    userRank = serializers.IntegerField()

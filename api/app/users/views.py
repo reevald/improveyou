@@ -4,41 +4,27 @@ from django.utils import timezone
 from items.models import Item, Reward
 from rest_framework import status
 from rest_framework.decorators import APIView
-from rest_framework.exceptions import AuthenticationFailed, ParseError, ValidationError
+from rest_framework.exceptions import (AuthenticationFailed, ParseError,
+                                       ValidationError)
 from rest_framework.response import Response
 from tasks.models import Task
 
 from .auths import JWTAuthentication, JWTHandler
-from .models import (
-    Bag,
-    DailyCheck,
-    DailyCheckQuestion,
-    EventReward,
-    GameStat,
-    Object,
-    TaskLog,
-    User,
-)
-from .serializers import (
-    LoginUserSerializer,
-    RegisterUserSerializer,
-    UserActivityFinishSerializer,
-    UserActivityQuizSerializer,
-    UserActivityStartSerializer,
-    UserBagEquipItemSerializer,
-    UserBagItemSerializer,
-    UserBagUnequipItemSerializer,
-    UserChangePublicitySerializer,
-    UserChangeUsernameSerializer,
-    UserDailyCheckQuestionSerializer,
-    UserDailyCheckSerializer,
-    UserEventRewardSerializer,
-    UserGameStatSerializer,
-    UserObjectSerializer,
-    UserStreakTrackSerializer,
-    UserTaskProgressSerializer,
-    UserTaskTrackSerializer,
-)
+from .models import (Bag, DailyCheck, DailyCheckQuestion, EventReward,
+                     GameStat, Object, TaskLog, User)
+from .serializers import (LoginUserSerializer, RegisterUserSerializer,
+                          UserActivityFinishSerializer,
+                          UserActivityQuizSerializer,
+                          UserActivityStartSerializer,
+                          UserBagEquipItemSerializer, UserBagItemSerializer,
+                          UserBagUnequipItemSerializer,
+                          UserChangePublicitySerializer,
+                          UserChangeUsernameSerializer,
+                          UserDailyCheckQuestionSerializer,
+                          UserDailyCheckSerializer, UserEventRewardSerializer,
+                          UserGameStatSerializer, UserObjectSerializer,
+                          UserStreakTrackSerializer,
+                          UserTaskProgressSerializer, UserTaskTrackSerializer)
 
 
 class RegisterView(APIView):
@@ -415,3 +401,47 @@ class UserMeTrackerView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class LeaderboardAPI(APIView):
+    throttle_scope = "resources_home"
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        gamestats = GameStat.objects.all().order_by('-poin_brain')[:10]
+        serializer = UserGameStatSerializer(gamestats, many=True)
+        leaderboard_data = []
+        user_rank = None
+        print(self.request.user.id,"❌")
+
+        for rank, gamestat in enumerate(gamestats, start=1):
+            try:
+                user_object = Object.objects.values(
+                "user_id__username",
+                "user_id",
+                "character_id",
+                "hat_id",
+                "clothes_id",
+                "shoes_id",
+                "background_id",
+                "character_id__sprite_path",
+                "hat_id__sprite_path",
+                "clothes_id__sprite_path",
+                "shoes_id__sprite_path",
+                "background_id__sprite_path",).get(user_id=gamestat.user_id)
+                gamestat_serializer = UserGameStatSerializer(gamestat)
+                object_serializer = UserObjectSerializer(user_object)
+                entry_data = {
+                    "username": user_object["user_id__username"],
+                    "rank": rank,
+                    "user_game_stat": gamestat_serializer.data,
+                    "user_object": object_serializer.data,
+                }
+                leaderboard_data.append(entry_data)
+                if user_object["user_id"] == self.request.user.id:
+                    user_rank = rank
+            except Object.DoesNotExist:
+                pass
+        if user_rank is not None:
+            leaderboard_data.append({"userRank": user_rank})
+        return Response(leaderboard_data, status=status.HTTP_200_OK)
