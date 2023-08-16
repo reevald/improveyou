@@ -8,12 +8,12 @@ REM Database
 set SQL_ENGINE=django.db.backends.mysql
 set SQL_DATABASE=improveyoudb
 set SQL_USER=root
-set SQL_PASSWORD=
+set SQL_PASSWORD=rootpassword
 set SQL_HOST=127.0.0.1
 set SQL_PORT=3306
 
 REM Caches
-set "CACHE_FILEBASED_LOCATION=D:/improveyou/api/cache"
+set "CACHE_FILEBASED_LOCATION=D:/Documents/AIC/improveyou/api/cache"
 
 REM Magic link
 set "VERIFY_MAGIC_LINK_SALT=django-insecure-*u6R5Q*zaBuphoTraprL"
