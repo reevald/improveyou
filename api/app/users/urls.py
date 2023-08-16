@@ -53,5 +53,5 @@ urlpatterns = [
         name="user-activity-finish",
     ),
     path("me/tracker", views.UserMeTrackerView.as_view(), name="user-tracker"),
-    path('me/leaderboard/', views.LeaderboardAPI.as_view(), name='leaderboard-api'),
+    path("leaderboard", views.LeaderboardAPI.as_view(), name="leaderboard-api"),
 ]

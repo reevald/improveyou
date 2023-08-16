@@ -1,30 +1,47 @@
+from activities.models import ACTIVITY_CATEGORIES
 from django.contrib.auth.models import update_last_login
 from django.db import DatabaseError, transaction
 from django.utils import timezone
 from items.models import Item, Reward
 from rest_framework import status
 from rest_framework.decorators import APIView
-from rest_framework.exceptions import (AuthenticationFailed, ParseError,
-                                       ValidationError)
+from rest_framework.exceptions import AuthenticationFailed, ParseError, ValidationError
 from rest_framework.response import Response
 from tasks.models import Task
 
 from .auths import JWTAuthentication, JWTHandler
-from .models import (Bag, DailyCheck, DailyCheckQuestion, EventReward,
-                     GameStat, Object, TaskLog, User)
-from .serializers import (LoginUserSerializer, RegisterUserSerializer,
-                          UserActivityFinishSerializer,
-                          UserActivityQuizSerializer,
-                          UserActivityStartSerializer,
-                          UserBagEquipItemSerializer, UserBagItemSerializer,
-                          UserBagUnequipItemSerializer,
-                          UserChangePublicitySerializer,
-                          UserChangeUsernameSerializer,
-                          UserDailyCheckQuestionSerializer,
-                          UserDailyCheckSerializer, UserEventRewardSerializer,
-                          UserGameStatSerializer, UserObjectSerializer,
-                          UserStreakTrackSerializer,
-                          UserTaskProgressSerializer, UserTaskTrackSerializer)
+from .models import (
+    Bag,
+    DailyCheck,
+    DailyCheckQuestion,
+    EventReward,
+    GameStat,
+    Object,
+    TaskLog,
+    User,
+)
+from .serializers import (
+    LoginUserSerializer,
+    RegisterUserSerializer,
+    UserActivityFinishSerializer,
+    UserActivityQuizSerializer,
+    UserActivityStartSerializer,
+    UserBagEquipItemSerializer,
+    UserBagItemSerializer,
+    UserBagUnequipItemSerializer,
+    UserChangePublicitySerializer,
+    UserChangeUsernameSerializer,
+    UserDailyCheckQuestionSerializer,
+    UserDailyCheckSerializer,
+    UserEventRewardSerializer,
+    UserGameStatSerializer,
+    UserLeaderboardSerializer,
+    UserObjectLeaderboardSerializer,
+    UserObjectSerializer,
+    UserStreakTrackSerializer,
+    UserTaskProgressSerializer,
+    UserTaskTrackSerializer,
+)
 
 
 class RegisterView(APIView):
@@ -404,44 +421,54 @@ class UserMeTrackerView(APIView):
 
 
 class LeaderboardAPI(APIView):
-    throttle_scope = "resources_home"
+    throttle_scope = "resources_leaderboard"
     authentication_classes = [JWTAuthentication]
 
     def get(self, request):
-        gamestats = GameStat.objects.all().order_by('-poin_brain')[:10]
-        serializer = UserGameStatSerializer(gamestats, many=True)
-        leaderboard_data = []
-        user_rank = None
-        print(self.request.user.id,"❌")
+        NUM_TOP_LEADERBOARD = 10
+        category = request.GET.get("category", None)
+        activity_categories = [cat[0] for cat in ACTIVITY_CATEGORIES]
+        if category and category not in activity_categories:
+            raise AuthenticationFailed("Invalid category")
 
-        for rank, gamestat in enumerate(gamestats, start=1):
-            try:
-                user_object = Object.objects.values(
-                "user_id__username",
-                "user_id",
-                "character_id",
-                "hat_id",
-                "clothes_id",
-                "shoes_id",
-                "background_id",
-                "character_id__sprite_path",
-                "hat_id__sprite_path",
-                "clothes_id__sprite_path",
-                "shoes_id__sprite_path",
-                "background_id__sprite_path",).get(user_id=gamestat.user_id)
-                gamestat_serializer = UserGameStatSerializer(gamestat)
-                object_serializer = UserObjectSerializer(user_object)
-                entry_data = {
-                    "username": user_object["user_id__username"],
-                    "rank": rank,
-                    "user_game_stat": gamestat_serializer.data,
-                    "user_object": object_serializer.data,
-                }
-                leaderboard_data.append(entry_data)
-                if user_object["user_id"] == self.request.user.id:
-                    user_rank = rank
-            except Object.DoesNotExist:
-                pass
-        if user_rank is not None:
-            leaderboard_data.append({"userRank": user_rank})
-        return Response(leaderboard_data, status=status.HTTP_200_OK)
+        categories = activity_categories if not category else [category]
+        leaderboards = []
+        for cat in categories:
+            poin_type = ""
+            if cat == "exercise":
+                poin_type = "poin_muscle"
+            if cat == "meditation":
+                poin_type = "poin_heart"
+            if cat == "reading":
+                poin_type = "poin_brain"
+
+            leaderboard = GameStat.objects.values(
+                "user_id__username", "user_id", poin_type
+            ).order_by(f"-{poin_type}")[:NUM_TOP_LEADERBOARD]
+            leaderboards.extend(leaderboard)
+
+        # Remove duplicate user
+        list_user_id = []
+        for data in leaderboards:
+            if data["user_id"] not in list_user_id:
+                list_user_id.append(data["user_id"])
+
+        data_objects = Object.objects.values(
+            "user_id",
+            "character_id__sprite_path",
+            "hat_id__sprite_path",
+            "clothes_id__sprite_path",
+            "shoes_id__sprite_path",
+            "background_id__sprite_path",
+        ).filter(user_id__in=list_user_id)
+
+        # Frontend note: need to preprocessing to match between gamestat and object
+        serializer_object = UserObjectLeaderboardSerializer(data_objects, many=True)
+        serializer_leaderboards = UserLeaderboardSerializer(leaderboards, many=True)
+        return Response(
+            {
+                "leaderboard_data": serializer_leaderboards.data,
+                "leaderboard_object": serializer_object.data,
+            },
+            status=status.HTTP_200_OK,
+        )

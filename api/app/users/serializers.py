@@ -16,8 +16,16 @@ from rest_framework.exceptions import AuthenticationFailed, ParseError
 from schema import And, Schema, SchemaError
 from tasks.models import Task
 
-from .models import (ActivityLog, Bag, DailyCheck, DailyCheckQuestion,
-                     GameStat, Object, TaskLog, User)
+from .models import (
+    ActivityLog,
+    Bag,
+    DailyCheck,
+    DailyCheckQuestion,
+    GameStat,
+    Object,
+    TaskLog,
+    User,
+)
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -862,14 +870,56 @@ class UserTaskTrackSerializer(serializers.ModelSerializer):
         fields = ["category", "completed_at"]
 
 
-class LeaderboardEntrySerializer(serializers.Serializer):
-    user_game_stat = UserGameStatSerializer()
-    user_object = UserObjectSerializer()
-    # score = serializers.IntegerField()
-    rank = serializers.IntegerField(source='user_rank')
-    username = serializers.CharField(source='user.username')
+class UserObjectLeaderboardSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(source="user_id")
+    obj_character_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="character_id__sprite_path"
+    )
+    obj_hat_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="hat_id__sprite_path"
+    )
+    obj_clothes_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="clothes_id__sprite_path"
+    )
+    obj_shoes_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="shoes_id__sprite_path"
+    )
+    obj_background_sprite = serializers.CharField(
+        style={"base_template": "textarea.html"}, source="background_id__sprite_path"
+    )
+
+    class Meta:
+        model = Object
+        fields = [
+            "id",
+            "obj_character_sprite",
+            "obj_hat_sprite",
+            "obj_clothes_sprite",
+            "obj_shoes_sprite",
+            "obj_background_sprite",
+        ]
 
 
-class LeaderboardSerializer(serializers.Serializer):
-    top20 = LeaderboardEntrySerializer(many=True)
-    userRank = serializers.IntegerField()
+class UserLeaderboardSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user_id__username")
+    id = serializers.UUIDField(source="user_id")
+
+    class Meta:
+        model = GameStat
+        fields = ["id", "username", "poin_muscle", "poin_heart", "poin_brain"]
+        extra_kwargs = {
+            "poin_muscle": {"required": False},
+            "poin_heart": {"required": False},
+            "poin_brain": {"required": False},
+        }
+
+    def to_representation(self, instance):
+        data = super(UserLeaderboardSerializer, self).to_representation(instance)
+        # Each category should has exact one poin_type
+        if data.get("poin_muscle", None):
+            data["category"] = "exercise"
+        if data.get("poin_heart", None):
+            data["category"] = "meditation"
+        if data.get("poin_brain", None):
+            data["category"] = "reading"
+        return data
