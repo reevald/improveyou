@@ -51,7 +51,7 @@ Users activities [JWTAuth]
 - [✅] User me resolve finish activity with impact
 
 Users leaderboard [JWTAuth]
-- User me leaderboard / [type poin]
+- [✅] User me leaderboard / [type poin]
 
 Users tracker [JWTAuth & EmailValidated]
 - [✅] User me tracker
@@ -85,8 +85,8 @@ Third party [conditional]
 - Amazon ses (sandbox, real(?))
 
 Integrate [final api]
-- Deploy + config database (prod mode)
-- Setting domain + https
+- [🔃] Deploy + config database (prod mode)
+- [✅] Setting domain + https
 
 ############# CONTENT [MVP] ############
 - Landing page [Logo, etc]
