@@ -16,11 +16,19 @@
     return response.json(); // parses JSON response into native JavaScript objects
   };
 
-  const testRefresh = async () => {
+  const testRefresh1 = async () => {
     await fetch('https://api.improveyou.fun/user/refresh', {
       credentials: 'same-origin'
     }).then(async (newjwt) => {
-      console.log('Test Refresh jwt', await newjwt.json());
+      console.log('Test 1: Refresh jwt', await newjwt.json());
+    });
+  };
+
+  const testRefresh2 = async () => {
+    await fetch('https://api.improveyou.fun/user/refresh', {
+      credentials: 'include'
+    }).then(async (newjwt) => {
+      console.log('Test 2: Refresh jwt', await newjwt.json());
     });
   };
 
@@ -29,7 +37,9 @@
     password: 'hilihwkwk'
   }).then(async (data) => {
     console.log('Test 1: Return LOGIN 🔐', data);
-    await testRefresh();
+    await testRefresh1();
+    console.log('----');
+    await testRefresh2();
   });
 
   testLogin('https://improveyou-api-v1-1-qguw2amrfq-uc.a.run.app/user/login', {
@@ -37,9 +47,12 @@
     password: 'hilihwkwk'
   }).then(async (data) => {
     console.log('Test 2: Return LOGIN 🔐', data);
-    await testRefresh();
+    await testRefresh1();
+    console.log('----');
+    await testRefresh2();
   });
 </script>
 
 <h1>Login page attempt 1</h1>
-<button on:click={testRefresh}>Test refresh jwt w/ cookies</button>
+<button on:click={testRefresh1}>Test refresh 1</button>
+<button on:click={testRefresh2}>Test refresh 2</button>
