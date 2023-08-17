@@ -16,19 +16,30 @@
     return response.json(); // parses JSON response into native JavaScript objects
   };
 
+  const testRefresh = async () => {
+    await fetch('https://api.improveyou.fun/user/refresh', {
+      credentials: 'same-origin'
+    }).then(async (newjwt) => {
+      console.log('Test Refresh jwt', await newjwt.json());
+    });
+  };
+
   testLogin('https://api.improveyou.fun/user/login', {
     email: 'bulelu@gmail.com',
     password: 'hilihwkwk'
-  }).then((data) => {
+  }).then(async (data) => {
     console.log('Test 1: Return LOGIN 🔐', data);
+    await testRefresh();
   });
 
   testLogin('https://improveyou-api-v1-1-qguw2amrfq-uc.a.run.app/user/login', {
     email: 'bulelu@gmail.com',
     password: 'hilihwkwk'
-  }).then((data) => {
+  }).then(async (data) => {
     console.log('Test 2: Return LOGIN 🔐', data);
+    await testRefresh();
   });
 </script>
 
 <h1>Login page attempt 1</h1>
+<button on:click={testRefresh}>Test refresh jwt w/ cookies</button>
