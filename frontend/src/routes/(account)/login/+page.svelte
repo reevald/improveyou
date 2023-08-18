@@ -18,7 +18,10 @@
 
   const testRefresh1 = async () => {
     await fetch('https://api.improveyou.fun/user/refresh', {
-      credentials: 'same-origin'
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     }).then(async (newjwt) => {
       console.log('Test 1: Refresh jwt', await newjwt.json());
     });
@@ -26,7 +29,10 @@
 
   const testRefresh2 = async () => {
     await fetch('https://api.improveyou.fun/user/refresh', {
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     }).then(async (newjwt) => {
       console.log('Test 2: Refresh jwt', await newjwt.json());
     });
