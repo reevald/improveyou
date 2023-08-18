@@ -65,6 +65,7 @@ class JWTHandler:
             secure=settings.COOKIES_REFRESH_TOKEN["SECURE"],
             samesite=settings.COOKIES_REFRESH_TOKEN["SAMESITE"],
             httponly=settings.COOKIES_REFRESH_TOKEN["HTTPONLY"],
+            domain=settings.COOKIES_REFRESH_TOKEN["DOMAIN"],
         )
         response.data = {"jwt": self.get_access_token()}
         response.status = status.HTTP_200_OK
