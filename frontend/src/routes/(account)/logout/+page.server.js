@@ -1,5 +1,5 @@
 import { cookieNameJWT } from '$lib/stores.js';
-
+export const ssr = true;
 let cookieName;
 
 cookieNameJWT.subscribe((value) => {

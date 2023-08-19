@@ -25,6 +25,7 @@ api/config/requirements/production.txt
 # From: npm create svelte@latest
 .DS_Store
 .svelte-kit/
+.vercel
 package/
 .env
 .env.*
