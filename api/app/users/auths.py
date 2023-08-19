@@ -59,7 +59,7 @@ class JWTHandler:
     def get_httpresponse_init_jwt(self):
         response = Response()
         response.set_cookie(
-            key="jwt",
+            key="__Secure-refresh-jwt",
             value=self.get_refresh_token(),
             max_age=settings.COOKIES_REFRESH_TOKEN["LIFETIME"],
             secure=settings.COOKIES_REFRESH_TOKEN["SECURE"],
@@ -73,7 +73,7 @@ class JWTHandler:
 
     def get_httpresponse_revoke_jwt(self):
         response = Response()
-        response.delete_cookie("jwt")
+        response.delete_cookie("__Secure-refresh-jwt")
         response.data = {
             "deleted-refresh": True,
         }
@@ -83,7 +83,7 @@ class JWTHandler:
 
 class JWTAuthentication(authentication.BaseAuthentication):
     def refresh_access_token(self, request):
-        token = request.COOKIES.get("jwt")
+        token = request.COOKIES.get("__Secure-refresh-jwt")
         if not token:
             raise AuthenticationFailed("Unauthentication")
 

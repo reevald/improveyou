@@ -1,97 +1,34 @@
 <script>
-  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-  const testLogin = async (url = '', data = {}) => {
-    const response = await fetch(url, {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, *cors, same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      redirect: 'follow', // manual, *follow, error
-      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: JSON.stringify(data) // body data type must match "Content-Type" header
-    });
-    return response.json(); // parses JSON response into native JavaScript objects
-  };
-
-  const testRefresh1 = async () => {
-    console.log('Test rest refresh 2 [BEGIN]');
-    await fetch('https://api.improveyou.fun/user/refresh', {
-      method: 'GET',
-      credentials: 'same-origin'
-    }).then(async (newjwt) => {
-      console.log('Test 1-1: Refresh jwt', await newjwt.json());
-    });
-    await fetch('https://api.improveyou.fun/user/refresh', {
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Credentials': true
-      }
-    }).then(async (newjwt) => {
-      console.log('Test 1-2: Refresh jwt', await newjwt.json());
-    });
-  };
-
-  const testRefresh2 = async () => {
-    console.log('Test rest refresh 2 [BEGIN]');
-    await fetch('https://api.improveyou.fun/user/refresh', {
-      method: 'GET',
-      credentials: 'include'
-    }).then(async (newjwt) => {
-      console.log('Test 2-1: Refresh jwt', await newjwt.json());
-    });
-
-    await fetch('https://api.improveyou.fun/user/refresh', {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }).then(async (newjwt) => {
-      console.log('Test 2-2: Refresh jwt', await newjwt.json());
-    });
-    console.log('Test rest refresh 2 [STOP]');
-  };
-
-  const testRefresh3 = async () => {
-    await fetch('https://api.improveyou.fun/user/refresh', {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Credentials': true
-      }
-    }).then(async (newjwt) => {
-      console.log('Test 2: Refresh jwt', await newjwt.json());
-    });
-  };
-
-  testLogin('https://api.improveyou.fun/user/login', {
-    email: 'bulelu@gmail.com',
-    password: 'hilihwkwk'
-  }).then(async (data) => {
-    console.log('Test 1: Return LOGIN 🔐', data);
-    // await testRefresh1();
-    // console.log('----');
-    // await testRefresh2();
-  });
-
-  testLogin('https://improveyou-api-v1-1-qguw2amrfq-uc.a.run.app/user/login', {
-    email: 'bulelu@gmail.com',
-    password: 'hilihwkwk'
-  }).then(async (data) => {
-    console.log('Test 2: Return LOGIN 🔐', data);
-    // await testRefresh1();
-    // console.log('----');
-    // await testRefresh2();
-  });
+  export let form;
+  if (typeof localStorage !== 'undefined' && form) {
+    localStorage.setItem('jwt', form?.jwt);
+  }
 </script>
 
+<a href="/logout">Logout</a>
+<a href="/home">Home</a>
 <h1>Login page attempt 1</h1>
-<button on:click={testRefresh1}>Test refresh 1</button>
-<button on:click={testRefresh2}>Test refresh 2</button>
-<button on:click={testRefresh3}>Test refresh 2</button>
+
+<form method="POST" action="?/login">
+  <label>
+    Url endpoint
+    <input name="endpoint" type="text" />
+  </label>
+  <label>
+    Cookie name
+    <input name="cookieName" type="text" />
+  </label>
+  <label>
+    Credential type
+    <input name="credType" type="text" />
+  </label>
+  <label>
+    Email
+    <input name="email" type="email" />
+  </label>
+  <label>
+    Password
+    <input name="password" type="password" />
+  </label>
+  <button>Log in</button>
+</form>
