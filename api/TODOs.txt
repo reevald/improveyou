@@ -85,7 +85,7 @@ Third party [conditional]
 - Amazon ses (sandbox, real(?))
 
 Integrate [final api]
-- [🔃] Deploy + config database (prod mode)
+- [✅] Deploy + config database (prod mode)
 - [✅] Setting domain + https
 
 ############# CONTENT [MVP] ############
