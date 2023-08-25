@@ -7,5 +7,5 @@
 - [✅] trainer module [urge]
 - [✅] interactive_pipelines [urge]
 - [🏃] pipelines [conditional: w/ apache beam/airflow] [urge]
-- deploy model w/ tf serving (urge prediction)
+- [✅] deploy model w/ tf serving (urge prediction) [TODO: from unauth (public) to auth service-to-service]
 - [🏃] [conditional] deploy tfx pipelines w/ vertex ai [urge]
