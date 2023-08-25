@@ -111,6 +111,7 @@ def get_serve_tf_examples_fn(model, tf_transform_output):
             **{
                 key: tf.TensorSpec(shape=[None, 1], dtype=tf.int64)
                 for key in tf_transform_output.raw_feature_spec().keys()
+                if key != raw_label_key
             }
         ),
         "predict": signature_predict.get_concrete_function(
