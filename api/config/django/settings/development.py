@@ -26,6 +26,7 @@ COOKIES_REFRESH_TOKEN = {
     "SECURE": False,  # Not safe
     "HTTPONLY": True,
     "SAMESITE": "None",  # Not safe
+    "DOMAIN": None,
 }
 
 REST_FRAMEWORK = {
