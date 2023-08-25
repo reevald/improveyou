@@ -1,0 +1,19 @@
+# Thanks: https://github.com/chuck1z/deploy-model/blob/TF-Serving/Dockerfile
+FROM tensorflow/serving:2.13.0
+
+# Copy model into image container
+COPY ./serving_saved_model/urge_model /models/urge-model
+
+# Setting environment variables
+ENV MODEL_NAME urge-model
+ENV MODEL_BASE_PATH /models
+
+# In this case: using rest api not grpc 
+EXPOSE 8501
+
+# Running in container
+CMD tensorflow_model_server \
+    --port=8501 \
+    --rest_api_port=8501 \
+    --model_name=${MODEL_NAME} \
+    --model_base_path=${MODEL_BASE_PATH}/${MODEL_NAME}
