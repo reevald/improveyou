@@ -66,8 +66,10 @@ def get_serve_tf_examples_fn(model, tf_transform_output):
         return transformed_features
 
     @tf.function
-    def signature_serving_default(serialized_examples):
-        single_logits = serialized_handler(serialized_examples)
+    def signature_serving_default(**kwargs_tensorspec):
+        # Now without serialize to make more independent when generate input model
+        transformed_features = model.tft_layer(kwargs_tensorspec)
+        single_logits = model(transformed_features)
         # In this case we have two class (binary case)
         # Ex (2 input): [[0.75], [0.2]] => [[0, 0.75], [0, 0,2]]
         binary_logits = tf.concat(
@@ -106,7 +108,10 @@ def get_serve_tf_examples_fn(model, tf_transform_output):
             tf.TensorSpec(shape=[None], dtype=tf.string, name="examples")
         ),
         "serving_default": signature_serving_default.get_concrete_function(
-            tf.TensorSpec(shape=[None], dtype=tf.string, name="examples")
+            **{
+                key: tf.TensorSpec(shape=[None, 1], dtype=tf.int64)
+                for key in tf_transform_output.raw_feature_spec().keys()
+            }
         ),
         "predict": signature_predict.get_concrete_function(
             tf.TensorSpec(shape=[None], dtype=tf.string, name="inputs")
