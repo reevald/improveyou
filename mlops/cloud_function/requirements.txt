@@ -1,3 +1,5 @@
 functions-framework==3.4.0
 SQLAlchemy==2.0.20
 pandas==2.0.3
+requests==2.31.0
+pg8000==1.30.1
