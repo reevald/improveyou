@@ -67,39 +67,37 @@ Authentications
 Permissions
 - [✅] Email validated permissions
 
-Throthling (scopes)
-- [🏃] Users app [Login, etc]
-- 
+- [✅] Throthling (scopes)
 
 Documentation
 - Readme
-- OpenApi spec (deploy with github page)
+- [🔮] OpenApi spec (deploy with github page)
 
 Unit test each app
-- Users
-- 
+- [🔮] Users
+- etc
 
 Third party [conditional]
-- Google login
-- Cloudinary
-- Amazon ses (sandbox, real(?))
+- [🔮] Google login
+- [🔮] Cloudinary
+- [🔮] Amazon ses (sandbox, real(?))
 
 Integrate [final api]
 - [✅] Deploy + config database (prod mode)
 - [✅] Setting domain + https
 
 ############# CONTENT [MVP] ############
-- Landing page [Logo, etc]
+- [🔮] Landing page [Logo, etc]
 
 Users object [Host: Cloudinary, etc]
-- Character (1 u/ default) [output: sprite/json]
-- Background (1 u/ default) [output: image/svg/png]
-- (hat, shirt, trouser) (2-3 u/ Shop), (1 u/ Reward leaderboard)
+- [✅] Character (1 u/ default) [output: sprite/json]
+- [✅] Background (1 u/ default) [output: image/svg/png]
+- [✅] (hat, shirt, trouser) (2-3 u/ Shop), (1 u/ Reward leaderboard)
 [output: sprite/json + thumbnail:image/svg/png]
-Sample themes: pakaian tentara, polisi, atau lainnya yang simple as possible
+Reference: open source game assets
 
 Activities [Host: Cloudinary, etc]
-- Exercise (5 model with ilustration) [output: model+lib(tfjs), images/json]
-- Meditation (3 model pose + 2 Audio) [output: model+lib(tfjs), images/json, audio]
+- Exercise (5 with ilustration) [output: images/json, audio]
+- Meditation (3 with ilustraitin + 2 with Audio) [output: images/json, audio]
 - Reading (5 Article) [output: artikel(json), soal-pilgan(json), answer-key(json/db-based+encrypt)]
 Reference: youtube, chatGPT, bard, etc
