@@ -1,0 +1,4 @@
+[Monthly Job Scheduler]
+- Collect data as train data
+- Convert poin into gold
+- Reset leaderboard and deliver reward
