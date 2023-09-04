@@ -128,9 +128,14 @@ class UserObjectSerializer(serializers.ModelSerializer):
 
 
 class UserGameStatSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        read_only=True, required=False, source="user_id__username"
+    )
+
     class Meta:
         model = GameStat
         fields = [
+            "username",
             "gold",
             "poin_brain",
             "poin_heart",
@@ -352,15 +357,19 @@ class UserDailyCheckSerializer(serializers.ModelSerializer):
         # 1) When continue streak +1 else 0
         # 2) Max streak percent interest 50% else 0-9=>0%, 10-19=>10%, etc
         GameStat.objects.filter(user_id=instance_user).update(
+            gold=F("gold") + settings.GOLD_DAILY_CHECK,
             streak_current=F("streak_current") + 1
             if validated_data.get("streak_status") == "continue" and grow_streak
             else 1
             if validated_data.get("streak_status") == "continue" and not grow_streak
             else 0,
             streak_percent_interest=Case(
-                When(streak_current__gte=49, then=50),
                 When(
-                    streak_current__lt=49,
+                    streak_current__gte=settings.MAX_STREAK_PERCENT - 1,
+                    then=settings.MAX_STREAK_PERCENT,
+                ),
+                When(
+                    streak_current__lt=settings.MAX_STREAK_PERCENT - 1,
                     then=ExpressionWrapper(
                         # In this stage, streak current already updated +1
                         F("streak_current") - F("streak_current") % 10,

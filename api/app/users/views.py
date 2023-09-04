@@ -154,7 +154,15 @@ class UserMeGameStatView(APIView):
 
     def get(self, request):
         try:
-            user_gamestat = GameStat.objects.get(user_id=self.request.user.id)
+            user_gamestat = GameStat.objects.values(
+                "user_id__username",
+                "gold",
+                "poin_brain",
+                "poin_heart",
+                "poin_muscle",
+                "streak_current",
+                "streak_percent_interest",
+            ).get(user_id=self.request.user.id)
         except GameStat.DoesNotExist:
             raise ParseError("Request contains malformed data")
         serializer = UserGameStatSerializer(user_gamestat)
