@@ -1,1 +1,1 @@
-<h1>Landing page</h1>
+<h1>Landing page (comming soon)</h1>
