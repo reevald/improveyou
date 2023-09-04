@@ -26,8 +26,9 @@ COOKIES_REFRESH_TOKEN = {
     "SECURE": False,  # Not safe
     "HTTPONLY": True,
     "SAMESITE": "None",  # Not safe
-    "DOMAIN": None,
+    "DOMAIN": "localimproveyou.fun",  # Custom host
 }
+COOKIES_NAME = "__Dev-refresh-jwt"  # Prod: __Secure-refresh-jwt
 
 REST_FRAMEWORK = {
     # Only return in JSON format
@@ -37,15 +38,15 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.ScopedRateThrottle"],
     "DEFAULT_THROTTLE_RATES": {
-        "register": "10/hour",
-        "login/logout": "10/hour",
-        "jwt:refresh/validate": "5/hour",
-        "resources_home": "720/hour",
+        "register": "20/hour",
+        "login/logout": "20/hour",
+        "jwt:refresh/validate": "720/hour",
+        "resources_home": "750/hour",
         "resources_activity": "720/hour",
         "resources_leaderboard": "720/hour",
         "change_username": "15/day",
         "change_publicity": "60/hour",
-        "buy_item": "30/hour",
+        "buy_item": "360/hour",
     },
 }
 
@@ -70,3 +71,7 @@ LOGGING = {
         },
     },
 }
+
+# GAME SETTINGS
+GOLD_DAILY_CHECK = 10
+MAX_STREAK_PERCENT = 50
