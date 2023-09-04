@@ -312,6 +312,15 @@
     const wrapBagElem = document.getElementById('wrapBagBox');
     const closeBagBtnElem = document.getElementById('closeBagBtn');
     const triggerShopFromBagBtnElem = document.getElementById('triggerShopFromBagBtn');
+    const wrapNotifSuccessDCElem = document.getElementById('wrapNotifSuccessDCBox');
+    const okNotifSuccessDCBtnElem = document.getElementById('okNotifSuccessDCBtn');
+
+    okNotifSuccessDCBtnElem.addEventListener('click', () => {
+      wrapNotifSuccessDCElem.classList.remove('flex');
+      wrapNotifSuccessDCElem.classList.add('hidden');
+      wrapDailyCheckElem.classList.remove('flex');
+      wrapDailyCheckElem.classList.add('hidden');
+    });
 
     closeBagBtnElem.addEventListener('click', () => {
       wrapBagElem.classList.remove('flex');
@@ -471,18 +480,25 @@
         qna: [],
         streak_status: streak_status
       };
+      wrapLoaderElem.classList.remove('hidden');
+      wrapLoaderElem.classList.add('flex');
       const respStatus = await postWithAuth(
         'user/me/dailycheck',
         objDailyCheck,
         false,
         successDailyCheck
       );
+      wrapLoaderElem.classList.add('hidden');
+      wrapLoaderElem.classList.remove('flex');
 
       if (respStatus != 200) {
         mainDailyCheckElem.classList.remove('flex');
         mainDailyCheckElem.classList.add('hidden');
         warnDailyCheckElem.classList.add('flex');
         warnDailyCheckElem.classList.remove('hidden');
+      } else {
+        wrapNotifSuccessDCElem.classList.add('flex');
+        wrapNotifSuccessDCElem.classList.remove('hidden');
       }
       pingDailyCheckBox.classList.remove('flex');
       pingDailyCheckBox.classList.add('hidden');
@@ -1229,6 +1245,26 @@
       <div class="text-sm font-medium text-center">
         Dailycheck already filled in today or something wrong
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notif Success DailyCheck -->
+<div
+  id="wrapNotifSuccessDCBox"
+  class="hidden absolute top-0 w-full flex-col justify-center items-center h-full bg-gray-900/80 z-20 pb-16"
+>
+  <div
+    style="max-width:196px;"
+    class="relative bg-white p-4 w-full h-full xxs:h-auto xxs:rounded-xl flex flex-col items-center text-gray-700 text-sm"
+  >
+    <div class="font-semibold mb-2">Info</div>
+    <div class="text-center mb-2">Your data has been successfully recorded.</div>
+    <div
+      id="okNotifSuccessDCBtn"
+      class="px-4 py-1 rounded-xl bg-amber-400 cursor-pointer hover:bg-amber-500 font-semibold"
+    >
+      Ok
     </div>
   </div>
 </div>
