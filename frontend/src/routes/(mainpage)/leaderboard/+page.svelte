@@ -183,37 +183,38 @@
       wrapLeaderboardExeElem.innerHTML = htmlLeaderboardExe;
       wrapLeaderboardMedElem.innerHTML = htmlLeaderboardMed;
       wrapLeaderboardReadElem.innerHTML = htmlLeaderboardRead;
-
-      data?.leaderboard_data.forEach((dataUser) => {
-        const cnv = document.querySelector(
-          `canvas[data-${dataUser?.category}-id="${dataUser?.id}"]`
-        );
-        const ctx = cnv.getContext('2d');
-        loadImage(dataCharacter.body.universal).then((img) => {
-          ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
-        });
-        loadImage(dictObj[dataUser?.id].objClotSprite || dataShirt.up.universal).then(
-          (img) => {
-            ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
-          }
-        );
-        loadImage(dataShirt.bottom.universal).then((img) => {
-          ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
-        });
-        loadImage(dictObj[dataUser?.id].objShoesSprite || dataShoes.universal).then(
-          (img) => {
-            ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
-          }
-        );
-        loadImage(dataCharacter.head.universal).then((img) => {
-          ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
-        });
-        loadImage(dictObj[dataUser?.id].objHatSprite || dataHat.universal).then(
-          (img) => {
-            ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
-          }
-        );
-      });
+      console.log('dataUser', data?.leaderboard_data);
+      // data?.leaderboard_data.forEach((dataUser) => {
+      //   // console.log("dataUser", dataUser)
+      //   const cnv = document.querySelector(
+      //     `canvas[data-${dataUser?.category}-id="${dataUser?.id}"]`
+      //   );
+      //   const ctx = cnv.getContext('2d');
+      //   loadImage(dataCharacter.body.universal).then((img) => {
+      //     ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
+      //   });
+      //   loadImage(dictObj[dataUser?.id].objClotSprite || dataShirt.up.universal).then(
+      //     (img) => {
+      //       ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
+      //     }
+      //   );
+      //   loadImage(dataShirt.bottom.universal).then((img) => {
+      //     ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
+      //   });
+      //   loadImage(dictObj[dataUser?.id].objShoesSprite || dataShoes.universal).then(
+      //     (img) => {
+      //       ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
+      //     }
+      //   );
+      //   loadImage(dataCharacter.head.universal).then((img) => {
+      //     ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
+      //   });
+      //   loadImage(dictObj[dataUser?.id].objHatSprite || dataHat.universal).then(
+      //     (img) => {
+      //       ctx.drawImage(img, 1 * 64, 10 * 64, 64, 64, 0, 0, cnv.width, cnv.height);
+      //     }
+      //   );
+      // });
     };
     getWithAuth('user/leaderboard', leaderboardHandler);
   });
