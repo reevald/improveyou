@@ -1,1 +1,1 @@
-<h1>Tracker page</h1>
+<div class="h-screen w-full"></div>
