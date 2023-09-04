@@ -925,10 +925,10 @@ class UserLeaderboardSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super(UserLeaderboardSerializer, self).to_representation(instance)
         # Each category should has exact one poin_type
-        if data.get("poin_muscle", None):
+        if data.get("poin_muscle") is not None:
             data["category"] = "exercise"
-        if data.get("poin_heart", None):
+        if data.get("poin_heart") is not None:
             data["category"] = "meditation"
-        if data.get("poin_brain", None):
+        if data.get("poin_brain") is not None:
             data["category"] = "reading"
         return data
