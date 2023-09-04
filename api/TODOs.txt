@@ -85,19 +85,3 @@ Third party [conditional]
 Integrate [final api]
 - [✅] Deploy + config database (prod mode)
 - [✅] Setting domain + https
-
-############# CONTENT [MVP] ############
-- [🔮] Landing page [Logo, etc]
-
-Users object [Host: Cloudinary, etc]
-- [✅] Character (1 u/ default) [output: sprite/json]
-- [✅] Background (1 u/ default) [output: image/svg/png]
-- [✅] (hat, shirt, trouser) (2-3 u/ Shop), (1 u/ Reward leaderboard)
-[output: sprite/json + thumbnail:image/svg/png]
-Reference: open source game assets
-
-Activities [Host: Cloudinary, etc]
-- Exercise (5 with ilustration) [output: images/json, audio]
-- Meditation (3 with ilustraitin + 2 with Audio) [output: images/json, audio]
-- Reading (5 Article) [output: artikel(json), soal-pilgan(json), answer-key(json/db-based+encrypt)]
-Reference: youtube, chatGPT, bard, etc
