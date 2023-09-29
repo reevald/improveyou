@@ -314,6 +314,27 @@
     const triggerShopFromBagBtnElem = document.getElementById('triggerShopFromBagBtn');
     const wrapNotifSuccessDCElem = document.getElementById('wrapNotifSuccessDCBox');
     const okNotifSuccessDCBtnElem = document.getElementById('okNotifSuccessDCBtn');
+    const dateTargetDCElem = document.getElementById('dateTargetDCBox');
+
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() - 1);
+    const nameMonths = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    dateTargetDCElem.innerText = `(${targetDate.getUTCDate()} ${
+      nameMonths[targetDate.getUTCMonth()]
+    } ${targetDate.getUTCFullYear()})`;
 
     okNotifSuccessDCBtnElem.addEventListener('click', () => {
       wrapNotifSuccessDCElem.classList.remove('flex');
@@ -1215,7 +1236,10 @@
       id="mainDailyCheckBox"
       class="flex flex-col w-full shadow-inner bg-gray-100 rounded-xl p-4 text-sm font-semibold text-gray-600"
     >
-      <div class="mb-4">Did you masturbate yesterday?</div>
+      <div class="mb-4">
+        Did you masturbate yesterday <span id="dateTargetDCBox">(Sun 27 Sep 2023)</span>
+        ?
+      </div>
       <div class="mb-4 flex flex-row w-full items-center justify-center">
         <div
           id="negAnsBtn"
@@ -1231,7 +1255,8 @@
         </div>
       </div>
       <div class="text-xs font-medium text-center">
-        By answering this question, your progress will be tracked.
+        By answering this question, your progress will be tracked. Reset each day at
+        7am. (GMT+7)
       </div>
     </div>
 
