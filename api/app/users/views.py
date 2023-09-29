@@ -404,6 +404,7 @@ class UserMeActivityFinishView(APIView):
 class UserMeTrackerView(APIView):
     authentication_classes = [JWTAuthentication]
 
+    # TODO: plan to create new field for "best streak" instead count manual
     def get(self, request):
         streak_track = (
             DailyCheck.objects.values("streak_status", "date_target")
@@ -413,7 +414,7 @@ class UserMeTrackerView(APIView):
 
         task_track = (
             TaskLog.objects.values("task_id__activity_category", "completed_at")
-            .filter(user_id=self.request.user.id)
+            .filter(user_id=self.request.user.id, completed_at__isnull=False)
             .order_by("-created_at")
         )
 
@@ -421,6 +422,7 @@ class UserMeTrackerView(APIView):
         serializer_track = UserTaskTrackSerializer(task_track, many=True)
         return Response(
             {
+                "date_joined": self.request.user.date_joined,
                 "streak_track": serializer_streak.data,
                 "task_track": serializer_track.data,
             },
