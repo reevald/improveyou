@@ -1,19 +1,21 @@
 <script>
   import { getWithAuth } from '$lib/api';
   import { onMount } from 'svelte';
+
+  const resizeWrap = (wrapElem) => {
+    wrapElem.style.height = `${screen.height}px`;
+    if (screen.width <= 480) {
+      wrapElem.style.width = `${screen.width}px`;
+    } else {
+      wrapElem.style.width = '480px';
+    }
+  };
+
   onMount(() => {
-    const resizeWrap = () => {
-      const wrapActElem = document.getElementById('wrapActivitiesBox');
-      wrapActElem.style.height = `${screen.height}px`;
-      if (screen.width <= 480) {
-        wrapActElem.style.width = `${screen.width}px`;
-      } else {
-        wrapActElem.style.width = '480px';
-      }
-    };
-    resizeWrap();
+    const wrapActElem = document.getElementById('wrapActivitiesBox');
+    resizeWrap(wrapActElem);
     window.addEventListener('resize', () => {
-      resizeWrap();
+      resizeWrap(wrapActElem);
     });
     let idRecom = [];
     let htmlActExe = '';

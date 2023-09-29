@@ -18,6 +18,10 @@
     return result;
   };
 
+  const resizeWrap = (wrapElem) => {
+    wrapElem.style.height = `${window.innerHeight}px`;
+  };
+
   let currQnaIdx = 0;
   let dataOpt;
 
@@ -27,14 +31,11 @@
   let orderQna;
 
   onMount(async () => {
-    const resizeWrap = () => {
-      const wrapActElem = document.getElementById('wrapActivityBox');
-      wrapActElem.style.height = `${window.innerHeight}px`;
-    };
+    const wrapActElem = document.getElementById('wrapActivityBox');
 
-    resizeWrap();
+    resizeWrap(wrapActElem);
     window.addEventListener('resize', () => {
-      resizeWrap();
+      resizeWrap(wrapActElem);
     });
 
     const articleElem = document.getElementById('articleBox');

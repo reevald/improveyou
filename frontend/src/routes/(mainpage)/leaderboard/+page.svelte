@@ -12,19 +12,20 @@
     });
   };
 
+  const resizeWrap = (wrapElem) => {
+    wrapElem.style.height = `${screen.height}px`;
+    if (screen.width <= 480) {
+      wrapElem.style.width = `${screen.width}px`;
+    } else {
+      wrapElem.style.width = '480px';
+    }
+  };
+
   onMount(() => {
-    const resizeWrap = () => {
-      const wrapActElem = document.getElementById('wrapActivitiesBox');
-      wrapActElem.style.height = `${screen.height}px`;
-      if (screen.width <= 480) {
-        wrapActElem.style.width = `${screen.width}px`;
-      } else {
-        wrapActElem.style.width = '480px';
-      }
-    };
-    resizeWrap();
+    const wrapLeaderboardElem = document.getElementById('wrapLeaderboardBox');
+    resizeWrap(wrapLeaderboardElem);
     window.addEventListener('resize', () => {
-      resizeWrap();
+      resizeWrap(wrapLeaderboardElem);
     });
 
     // These are default of objets
@@ -219,7 +220,7 @@
 </script>
 
 <div
-  id="wrapActivitiesBox"
+  id="wrapLeaderboardBox"
   class="max-h-screen w-[480] pb-16 bg-gray-100 text-gray-600"
 >
   <div class="h-full overflow-y-auto w-full py-6 flex flex-col">

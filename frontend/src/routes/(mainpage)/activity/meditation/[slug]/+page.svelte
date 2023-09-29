@@ -17,17 +17,18 @@
     return rawTime.minutes * 60 + rawTime.seconds;
   };
 
+  const resizeWrap = (wrapElem) => {
+    wrapElem.style.height = `${window.innerHeight}px`;
+  };
+
   let IYTimer;
   let isDelayFinished = false;
   let isPostStart = true;
   onMount(async () => {
-    const resizeWrap = () => {
-      const wrapActElem = document.getElementById('wrapActivityBox');
-      wrapActElem.style.height = `${window.innerHeight}px`;
-    };
-    resizeWrap();
+    const wrapActElem = document.getElementById('wrapActivityBox');
+    resizeWrap(wrapActElem);
     window.addEventListener('resize', () => {
-      resizeWrap();
+      resizeWrap(wrapActElem);
     });
 
     const ctrlPlayPauseBtnElem = document.getElementById('ctrlPlayPauseBtn');
