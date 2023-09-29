@@ -18,7 +18,7 @@ ImproveYou is a platform that combines elements of gamification and artificial i
 - Collect gold with daily check
 - Buy item character with gold
 - Monthly convert poin to gold (under development)
-- Tracker statistic page (visualization) (under development)
+- Tracker statistic page (visualization)
 
 ## Teams
 

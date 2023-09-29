@@ -12,5 +12,5 @@
 - [🔮] /activities/[type activity] #{exercise, meditation, reading}
 - [✅] /activity/[type activity]/[slug activity]
 - /leaderboard/[type activity]
-- /tracker
+- [✅] /tracker
 - [✅] /429-too-many-requests
