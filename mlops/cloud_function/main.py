@@ -247,12 +247,15 @@ def collect_and_predict(request):
         )
         values_insert += "," if idx != len(response["outputs"]) - 1 else ""
 
-    with db.connect() as conn:
-        conn.execute(
-            sqlalchemy.text(
-                f"INSERT INTO users_recommendation_log (id, user_id, prediction, urge_level, issue_at) VALUES {values_insert}"  # noqa: E501
+    if values_insert != "":
+        with db.connect() as conn:
+            conn.execute(
+                sqlalchemy.text(
+                    f"INSERT INTO users_recommendation_log (id, user_id, prediction, urge_level, issue_at) VALUES {values_insert}"  # noqa: E501
+                )
             )
-        )
-        conn.commit()
+            conn.commit()
 
-    return "Done!  -🔥🔥🔥 v1"
+        return "Generate Recommendation Successfully - 🔥🔥🔥 v1"
+
+    return "Done! - 🔥🔥🔥 v1"
