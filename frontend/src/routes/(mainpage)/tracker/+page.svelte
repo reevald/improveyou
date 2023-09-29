@@ -243,7 +243,9 @@
       const diffDays = Math.round(Math.abs((firstDate - lastDate) / msInADay)) + 1;
 
       dataEvent?.task_track?.forEach((task) => {
-        const taskDate = new Date(task?.completed_at).getTime();
+        let taskDate = new Date(task?.completed_at);
+        taskDate.setHours(0, 0, 0, 0);
+        taskDate = taskDate.getTime();
         if (firstDate <= taskDate && taskDate <= lastDate) {
           finalResultGraph[task?.category] += 1;
         }
