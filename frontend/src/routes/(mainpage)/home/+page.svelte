@@ -526,11 +526,11 @@
     };
 
     negAnsBtnElem.addEventListener('click', async () => {
-      await dailyCheckResolver('discontinue');
+      await dailyCheckResolver('continue');
     });
 
     posAnsBtnElem.addEventListener('click', async () => {
-      await dailyCheckResolver('continue');
+      await dailyCheckResolver('discontinue');
     });
 
     canvasElem = document.getElementById('canvasBox');
