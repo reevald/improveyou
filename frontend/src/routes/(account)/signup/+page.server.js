@@ -28,26 +28,26 @@ export const actions = {
       cookieNameJWT.update(() => cookieName);
 
       // Prod Mode
-      // cookies.set(cookieName, values[cookieName], {
-      //   expires: new Date(values['expires']),
-      //   maxAge: values['Max-Age'],
-      //   path: '/',
-      //   httpOnly: true,
-      //   sameSite: 'lax', // true = Strict
-      //   secure: true,
-      //   domain: 'improveyou.fun'
-      // });
-
-      // Dev Mode
       cookies.set(cookieName, values[cookieName], {
         expires: new Date(values['expires']),
         maxAge: values['Max-Age'],
         path: '/',
         httpOnly: true,
         sameSite: 'lax', // true = Strict
-        secure: false,
-        domain: 'localimproveyou.fun' // with custom hosts
+        secure: true,
+        domain: 'improveyou.fun'
       });
+
+      // Dev Mode
+      // cookies.set(cookieName, values[cookieName], {
+      //   expires: new Date(values['expires']),
+      //   maxAge: values['Max-Age'],
+      //   path: '/',
+      //   httpOnly: true,
+      //   sameSite: 'lax', // true = Strict
+      //   secure: false,
+      //   domain: 'localimproveyou.fun' // with custom hosts
+      // });
     }
     return {
       req: { username, email, password },
