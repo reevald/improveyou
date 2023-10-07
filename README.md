@@ -20,6 +20,10 @@ ImproveYou is a platform that combines elements of gamification and artificial i
 - Monthly convert poin to gold (under development)
 - Tracker statistic page (visualization)
 
+## How Recommendation Works
+
+![Alt text](Flow-ML-Improveyou.png)
+
 ## Teams
 
 - [Moch. Galang Rivaldo](https://www.linkedin.com/in/moch-galang-rivaldo/)
