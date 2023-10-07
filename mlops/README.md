@@ -22,6 +22,7 @@ A TFX pipeline is a sequence of components that implement an ML pipeline which i
 
 # Acknowledgements
 
+- [Ahmad Hilman Prasetya](https://id.linkedin.com/in/ahmad-hilman-prasetya) & [Herley Shaori Al-Ash](https://id.linkedin.com/in/herleyshaori) - for providing great insights for machine learning and product of ImproveYou.
 - [AIC Compfest 2023](https://compfest.id/) - for providing GCP credit support.
 
 # References
